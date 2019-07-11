@@ -215,25 +215,30 @@ class Debugger(object):
   def show_all_imgs(self, pause=False, time=0):
     if not self.ipynb:
       for i, v in self.imgs.items():
-        cv2.imshow('{}'.format(i), v)
+        #cv2.imshow('{}'.format(i), v)
+        print("write not ipynb img")
+        cv2.imwrite("../visDemo/" + '{}.png'.format(i), v)
       if cv2.waitKey(0 if pause else 1) == 27:
         import sys
         sys.exit(0)
     else:
       self.ax = None
       nImgs = len(self.imgs)
-      fig=self.plt.figure(figsize=(nImgs * 10,10))
+      #fig=self.plt.figure(figsize=(nImgs * 10,10))
       nCols = nImgs
       nRows = nImgs // nCols
       for i, (k, v) in enumerate(self.imgs.items()):
-        fig.add_subplot(1, nImgs, i + 1)
+        #fig.add_subplot(1, nImgs, i + 1)
         if len(v.shape) == 3:
-          self.plt.imshow(cv2.cvtColor(v, cv2.COLOR_BGR2RGB))
-        else:
-          self.plt.imshow(v)
-      self.plt.show()
+          print("write yes ipynb img")
+          cv2.imwrite("../visDemo/" + '{}.png'.format(i) , cv2.cvtColor(v, cv2.COLOR_BGR2RGB))    
+          #self.plt.imshow(cv2.cvtColor(v, cv2.COLOR_BGR2RGB))
+        #else:
+          #self.plt.imshow(v)
+      #self.plt.show()
 
   def save_img(self, imgId='default', path='./cache/debug/'):
+    print("save img")
     cv2.imwrite(path + '{}.png'.format(imgId), self.imgs[imgId])
     
   def save_all_imgs(self, path='./cache/debug/', prefix='', genID=False):

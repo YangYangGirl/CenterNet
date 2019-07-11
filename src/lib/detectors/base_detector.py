@@ -112,9 +112,7 @@ class BaseDetector(object):
       torch.cuda.synchronize()
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
-      
       output, dets, forward_time = self.process(images, return_time=True)
-
       torch.cuda.synchronize()
       net_time += forward_time - pre_process_time
       decode_time = time.time()
@@ -122,7 +120,6 @@ class BaseDetector(object):
       
       if self.opt.debug >= 2:
         self.debug(debugger, images, dets, output, scale)
-      
       dets = self.post_process(dets, meta, scale)
       torch.cuda.synchronize()
       post_process_time = time.time()
