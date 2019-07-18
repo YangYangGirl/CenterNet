@@ -66,8 +66,14 @@ class BaseTrainer(object):
       for k in batch:
         if k != 'meta':
           batch[k] = batch[k].to(device=opt.device, non_blocking=True)    
+      print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      print("batch.keys", batch.keys())
+      print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      print(batch['input'].size())
       output, loss, loss_stats = model_with_loss(batch)
+      print("loss", loss)
       loss = loss.mean()
+      print("loss after mean", loss.mean())
       if phase == 'train':
         self.optimizer.zero_grad()
         loss.backward()

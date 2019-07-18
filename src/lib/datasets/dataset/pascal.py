@@ -30,7 +30,7 @@ class PascalVOC(data.Dataset):
     self.class_name = ['__background__', "aeroplane", "bicycle", "bird", "boat",
      "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", 
      "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", 
-     "train", "tvmonitor"]
+     "train", "tvmonitor"] 
     self._valid_ids = np.arange(1, 21, dtype=np.int32)
     self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
     self._data_rng = np.random.RandomState(123)

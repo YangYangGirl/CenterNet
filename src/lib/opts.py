@@ -12,7 +12,7 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='coco',
+    self.parser.add_argument('--dataset', default='pascal',
                              help='coco | kitti | coco_hp | pascal')
     self.parser.add_argument('--exp_id', default='default')
     self.parser.add_argument('--test', action='store_true')
@@ -22,7 +22,7 @@ class opts(object):
                                   '2: show the network output features'
                                   '3: use matplot to display' # useful when lunching training with ipython notebook
                                   '4: save all visualizations to disk')
-    self.parser.add_argument('--demo', default='', 
+    self.parser.add_argument('--demo', default='/data/yy/github/CenterNet/images', 
                              help='path to image/ image folders/ video. '
                                   'or "webcam"')
     self.parser.add_argument('--load_model', default='',
@@ -269,7 +269,9 @@ class opts(object):
     print('training chunk_sizes:', opt.chunk_sizes)
 
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
+    
     opt.data_dir = os.path.join(opt.root_dir, 'data')
+    print(opt.data_dir)
     opt.exp_dir = os.path.join(opt.root_dir, 'exp', opt.task)
     opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
     opt.debug_dir = os.path.join(opt.save_dir, 'debug')
