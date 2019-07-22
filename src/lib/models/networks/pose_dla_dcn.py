@@ -478,6 +478,7 @@ class DLASeg(nn.Module):
 
         z = {}
         for head in self.heads:
+            #print("head: ", head, "head.shape: ", self.__getattr__(head), "y[-1].shape: ", y[-1].shape, "y[-1]: ", y[-1])
             z[head] = self.__getattr__(head)(y[-1])
         return [z]
     

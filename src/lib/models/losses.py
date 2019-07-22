@@ -13,6 +13,15 @@ import torch.nn as nn
 from .utils import _tranpose_and_gather_feat
 import torch.nn.functional as F
 
+class L2Loss(nn.Module):
+    def __init__(self):
+        super(L2Loss, self).__init__()
+
+    def forward(self, output, mask, ind, target):
+        pred = _tranpose_and_gather_feat(output, ind)
+        mask = mask.unsqueeze(2).expand_as(pred).float()
+        loss = F.mse_loss(pred * mask, target * mask, reduction='sum')
+        return loss
 
 def _slow_neg_loss(pred, gt):
   '''focal loss from CornerNet'''
