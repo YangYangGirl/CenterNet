@@ -377,7 +377,6 @@ class Fourbranch(nn.Module):
         )
 
     def use_softmax(self, x):
-        print("=================x.shape", x.shape)
         x = x.view([x.size(0), 14, 14, 2 * self.B, 51])
         y = t.empty(x.size(0), 14, 14, 2 * self.B, 51)
         y[:, :, :, :, 0] = t.sigmoid(x[:, :, :, :, 0].contiguous())
@@ -394,7 +393,8 @@ class Fourbranch(nn.Module):
         x1 = self.use_softmax(self.branch1(x))
         x2 = self.use_softmax(self.branch2(x))
         x3 = self.use_softmax(self.branch3(x))
-
+        print("------- pln device---------", x0.device)
+        
         return t.stack([x0, x1, x2, x3], 0)
 
 
@@ -417,9 +417,8 @@ class PLN(nn.Module):
         four_out = self.fourbranch(f)
         z = {}
         for head in self.heads:
-            print("shape of four_out", four_out.shape)
             z[head] = four_out[0, :, :, :, 0, :]      
-        return z
+        return [z]
 
     def load_pretrained_model(self, data='imagenet', name='inceptionresnetv2'):
         if name.endswith('pth'):
@@ -435,33 +434,6 @@ class PLN(nn.Module):
             self.channels[-1], num_classes,
             kernel_size=1, stride=1, padding=0, bias=True)
         self.load_state_dict(model_weights)
-
-    def get_optimizer(self):
-        """
-        return optimizer, It could be overwriten if you want to specify
-        special optimizer
-        """
-        lr = opt.lr
-        params = []
-        for key, value in dict(self.named_parameters()).items():
-            if value.requires_grad:
-                if 'bias' in key:
-                    params += [{'params': [value], 'lr': lr * 2, 'weight_decay': 0.00004}]
-                else:
-                    params += [{'params': [value], 'lr': lr, 'weight_decay': 0.00004}]
-
-        if opt.use_adam:
-            self.optimizer = t.optim.Adam(params)
-        elif opt.use_RMSprop:
-            self.optimizer = t.optim.RMSprop(params, alpha=0.9)
-        else:
-            self.optimizer = t.optim.SGD(params, momentum=0.9)
-        return self.optimizer
-
-    def scale_lr(self, decay=0.1):
-        for param_group in self.optimizer.param_groups:
-            param_group['lr'] *= decay
-        return self.optimizer
 
 def get_pln_net(num_layers, heads, head_conv=256):
     model = PLN(heads, InceptionResNetV2())
