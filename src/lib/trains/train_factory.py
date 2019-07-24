@@ -14,4 +14,5 @@ train_factory = {
   'ctdet': CtdetTrainer,
   'multi_pose': MultiPoseTrainer,
   'pln': plnCtdetTrainer, 
+  'plnres': plnCtdetTrainer,
 }
