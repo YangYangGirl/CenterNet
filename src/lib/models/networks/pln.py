@@ -393,7 +393,6 @@ class Fourbranch(nn.Module):
         x1 = self.use_softmax(self.branch1(x))
         x2 = self.use_softmax(self.branch2(x))
         x3 = self.use_softmax(self.branch3(x))
-        print("------- pln device---------", x0.device)
         
         return t.stack([x0, x1, x2, x3], 0)
 
