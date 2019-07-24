@@ -35,7 +35,7 @@ class BaseTrainer(object):
         chunk_sizes=chunk_sizes).to(device)
     else:
       self.model_with_loss = self.model_with_loss.to(device)
-    
+    print("for state in self.optimizer.state.values()")
     for state in self.optimizer.state.values():
       for k, v in state.items():
         if isinstance(v, torch.Tensor):
@@ -66,7 +66,7 @@ class BaseTrainer(object):
       for k in batch:
         if k != 'meta':
           batch[k] = batch[k].to(device=opt.device, non_blocking=True)    
-      print("batch.keys", batch.keys())
+      
       #print(batch['hm'].cpu().numpy().size)  32* 20 * 96* 96
       output, loss, loss_stats = model_with_loss(batch)
       loss = loss.mean() # mean of two

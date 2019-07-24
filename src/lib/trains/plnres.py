@@ -15,9 +15,9 @@ from utils.oracle_utils import gen_oracle_map
 from .base_trainer import BaseTrainer
 
 
-class plnCtdetLoss(torch.nn.Module):
+class plnresCtdetLoss(torch.nn.Module):
     def __init__(self, opt):
-        super(plnCtdetLoss, self).__init__()
+        super(plnresCtdetLoss, self).__init__()
         self.crit = torch.nn.MSELoss(reduction='sum')
         self.opt = opt
 
@@ -30,6 +30,7 @@ class plnCtdetLoss(torch.nn.Module):
             output = outputs[s]
             output['ct'] = output['ct'].to(self.opt.device)
             #ct_exist_loss += self.crit(output['ct'][:, :, :, 0], batch['ct']) / self.opt.num_stacks
+            #print(output['ct'][:, :, :, 0].shape, batch['ct'].shape)
             output_ct_pt = output['ct'][:, :, :, 0] * batch['ct']   #  -1 **2
             output_ct_nopt = output['ct'][:, :, :, 0] * (1 - batch['ct'])  # **2
             ct_pt_loss += self.crit(output_ct_pt, batch['ct']) / self.opt.num_stacks
@@ -42,13 +43,13 @@ class plnCtdetLoss(torch.nn.Module):
         return loss, loss_stats
 
 
-class plnCtdetTrainer(BaseTrainer):
+class plnresCtdetTrainer(BaseTrainer):
     def __init__(self, opt, model, optimizer=None):
-        super(plnCtdetTrainer, self).__init__(opt, model, optimizer=optimizer)
+        super(plnresCtdetTrainer, self).__init__(opt, model, optimizer=optimizer)
 
     def _get_losses(self, opt):
         loss_states = ['ct_exist_loss', 'ct_pt_loss', 'ct_nopt_loss']
-        loss = plnCtdetLoss(opt)
+        loss = plnresCtdetLoss(opt)
         return loss_states, loss
 
     def debug(self, batch, output, iter_id):
