@@ -29,6 +29,25 @@ model_urls = {
     'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
 }
 
+class BasicConv2d(nn.Module):
+
+    def __init__(self, in_planes, out_planes, kernel_size, stride, padding=0):
+        super(BasicConv2d, self).__init__()
+        self.conv = nn.Conv2d(in_planes, out_planes,
+                              kernel_size=kernel_size, stride=stride,
+                              padding=padding, bias=False)  # verify bias false
+        self.bn = nn.BatchNorm2d(out_planes,
+                                 eps=0.001,  # value found in tensorflow
+                                 momentum=0.1,  # default pytorch value
+                                 affine=True)
+        self.relu = nn.ReLU(inplace=False)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        return x
+
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -127,6 +146,44 @@ def fill_fc_weights(layers):
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
 
+class Fourbranch(nn.Module):
+
+    def __init__(self):
+        super(Fourbranch, self).__init__()
+        self.B = 2
+
+        self.branch0 = nn.Sequential(
+            BasicConv2d(1536, 1536, kernel_size=3, stride=1, padding=1),
+            BasicConv2d(1536, 204, kernel_size=3, stride=1, padding=1),
+        )
+
+        self.branch1 = nn.Sequential(
+            BasicConv2d(1536, 1536, kernel_size=3, stride=1, padding=1),
+            BasicConv2d(1536, 204, kernel_size=3, stride=1, padding=1),
+        )
+
+        self.branch2 = nn.Sequential(
+            BasicConv2d(1536, 1536, kernel_size=3, stride=1, padding=1),
+            BasicConv2d(1536, 204, kernel_size=3, stride=1, padding=1),
+        )
+
+        self.branch3 = nn.Sequential(
+            BasicConv2d(1536, 1536, kernel_size=3, stride=1, padding=1),
+            BasicConv2d(1536, 204, kernel_size=3, stride=1, padding=1),
+        )
+
+    def use_softmax(self, x):
+        x = x.view([x.size(0), 14, 14, 2 * self.B, 51])
+        y = t.empty(x.size(0), 14, 14, 2 * self.B, 51)
+        y[:, :, :, :, 0] = t.sigmoid(x[:, :, :, :, 0].contiguous())
+        y[:, :, :, :, 1: 21] = F.softmax(x[:, :, :, :, 1: 21].contiguous(), dim=3)
+        # print("===== y[0, 0, 0, 1: 21] =====")
+        # print(y[0, 0, 0, 1: 21])
+        y[:, :, :, :, 21: 23] = x[:, :, :, :, 21: 23]
+        y[:, :, :, :, 23: 37] = F.softmax(x[:, :, :, :, 23: 37].contiguous(), dim=3)
+        y[:, :, :, :, 37: 51] = F.softmax(x[:, :, :, :, 37: 51].contiguous(), dim=3)
+        return y
+
 class PlnResNet(nn.Module):
 
     def __init__(self, block, layers, heads, head_conv):
@@ -134,7 +191,7 @@ class PlnResNet(nn.Module):
         self.heads = heads
         self.deconv_with_bias = False
 
-        super(PoseResNet, self).__init__()
+        super(PlnResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
@@ -151,7 +208,23 @@ class PlnResNet(nn.Module):
             [256, 128, 64],
             [4, 4, 4],
         )
+        
+        '''self.deconv_layers = self._make_deconv_layer(
+            1,
+            [256],
+            [4],
+        )'''
 
+        self.convadd1 = BasicConv2d(64, 64, kernel_size=3, stride=1, padding=1) 
+        self.convadd2 = BasicConv2d(64, 204, kernel_size=3, stride=1, padding=1)
+        self.dil1 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=2, padding=2)
+        self.dil2 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=2, padding=2)
+        self.dil3 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=4, padding=4)
+        self.dil4 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=8, padding=8)
+        self.dil5 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=16, padding=16)
+        self.dil6 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=1, padding=1)
+        self.dil7 = nn.Conv2d(204, 204, 1, stride=1, bias=False, dilation=1)
+        
         for head in self.heads:
             classes = self.heads[head]
             if head_conv > 0:
@@ -255,13 +328,25 @@ class PlnResNet(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-
+        #print("after res18 x shape", x.shape) #14 * 14 * 512 
         x = self.deconv_layers(x)
-        print("after deconv x shape", x.shape)
-        four_out = self.fourbranch(f)
+        #print("after deconv x shape", x.shape) #112 * 112 * 64
+        x = self.convadd1(x)
+        x = self.convadd2(x)
+        #print("after conv x shape", x.shape)
+        '''x = self.dil1(x)
+        print("after dil1  x shape", x.shape)
+        x = x + self.dil2(x)
+        x = x + self.dil3(x)
+        x = x + self.dil4(x)
+        x = x + self.dil5(x)
+        x = x + self.dil6(x)
+        x = x + self.dil7(x)
+        print("after dila7 x shape", x.shape)'''
+        x = x.permute(0, 2, 3, 1)
         z = {}
         for head in self.heads:
-            z[head] = four_out[0, :, :, :, 0, :]      
+            z[head] = x    
         return [z]
         
     def init_weights(self, num_layers):

@@ -350,6 +350,13 @@ class InceptionResNetV2(nn.Module):
         # x = self.logits(x)
         return x
 
+    def pretrained_inception(self, name='inceptionresnetv2.pth'):
+        model_dict = self.state_dict()
+        pretrained_dict = t.load("/data/yy/github/CenterNet/models/" + name)
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        self.load_state_dict(model_dict)
+ 
 class Fourbranch(nn.Module):
 
     def __init__(self):
@@ -402,6 +409,7 @@ class PLN(nn.Module):
     def __init__(self, heads, inception_V2):
         super(PLN, self).__init__()
         self.inception_V2 = inception_V2
+        self.inception_V2.pretrained_inception()
         self.fourbranch = Fourbranch()
 
         self.grid_size = 14
@@ -419,20 +427,21 @@ class PLN(nn.Module):
             z[head] = four_out[0, :, :, :, 0, :]      
         return [z]
 
-    def load_pretrained_model(self, data='imagenet', name='inceptionresnetv2'):
-        if name.endswith('pth'):
-            model_weights = t.load(data + name)
+    '''def init_weights(self, data='imagenet', name='inceptionresnetv2.pth'):
+        if name.endswith('l'):
+            model_weights = t.load("/data/yy/github/CenterNet/models/" + name)
         else:
-            model_dict = self.state_dict()
+            model_dict = self.state_dict("/data/yy/github/CenterNet/models/" + name)
             pretrained_dict = t.load(opt.pretrain_path)
             pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
             model_dict.update(pretrained_dict)
             model_weights = model_dict
-        num_classes = len(model_weights[list(model_weights.keys())[-1]])
+            num_classes = len(model_weights[list(model_weights.keys())[-1]])
         self.fc = nn.Conv2d(
             self.channels[-1], num_classes,
-            kernel_size=1, stride=1, padding=0, bias=True)
+            kernel_size=1, stride=1, padding=0, bias=True) 
         self.load_state_dict(model_weights)
+     '''
 
 def get_pln_net(num_layers, heads, head_conv=256):
     model = PLN(heads, InceptionResNetV2())

@@ -21,7 +21,7 @@ class plnresCtdetLoss(torch.nn.Module):
         self.crit = torch.nn.MSELoss(reduction='sum')
         self.opt = opt
 
-    def forward(self, outputs, batch):
+    '''def forward(self, outputs, batch):
         opt = self.opt
         ct_exist_loss = 0
         ct_pt_loss = 0
@@ -41,8 +41,45 @@ class plnresCtdetLoss(torch.nn.Module):
                       'ct_nopt_loss': ct_nopt_loss}
         loss = ct_exist_loss
         return loss, loss_stats
-
-
+    '''
+    def forward(self, outputs, batch):
+        opt = self.opt
+        ct_exist_loss = 0
+        ct_pt_loss = 0
+        ct_nopt_loss = 0
+        for s in range(opt.num_stacks):
+            output = outputs[s]
+            output['ct'] = output['ct'].to(self.opt.device)
+            for i in range(len(output)):
+                gt = batch['ct'][i].contiguous().view(-1)
+                pred = output['ct'][:, :, :, 0][i].contiguous().view(-1)
+                print("===== pred ======")
+                print(pred)
+                pos_inds = gt.eq(1).float()
+                neg_inds = gt.lt(1).float()
+                num_pos = pos_inds.sum()
+                '''if num_pos == 0:
+                    continue'''
+                num_neg = num_pos * 3
+                #pred_pos = (pos_inds * pred).float()
+                pred_neg = (neg_inds * pred).float()
+                pred_neg = pred_neg.sort(descending=True)   
+                if num_pos == 0:
+                    num_pos = 1         
+                print("================")      
+                print("num_pos", num_pos)
+                print("num_neg", num_neg)  
+                print("======   =======")
+                print(pred_neg[0][0: num_neg.int()]) 
+                ct_pt_loss += (((pred - 1) ** 2) * pos_inds).sum()  / self.opt.num_stacks / num_pos
+                ct_nopt_loss += (pred_neg[0][0: num_neg.int()] ** 2).sum() / self.opt.num_stacks / num_pos
+        ct_exist_loss = self.opt.ct_pt_weight * ct_pt_loss + self.opt.ct_nopt_weight * ct_nopt_loss
+        
+        loss_stats = {'ct_exist_loss': ct_exist_loss, 'ct_pt_loss': ct_pt_loss,
+                      'ct_nopt_loss': ct_nopt_loss}
+        loss = ct_exist_loss
+        return loss, loss_stats
+        
 class plnresCtdetTrainer(BaseTrainer):
     def __init__(self, opt, model, optimizer=None):
         super(plnresCtdetTrainer, self).__init__(opt, model, optimizer=optimizer)

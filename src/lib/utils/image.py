@@ -33,6 +33,7 @@ def get_affine_transform(center,
     if not isinstance(scale, np.ndarray) and not isinstance(scale, list):
         scale = np.array([scale, scale], dtype=np.float32)
 
+    #print("center", center, "scale", scale, "rot", rot, "output_size", output_size)
     scale_tmp = scale
     src_w = scale_tmp[0]
     dst_w = output_size[0]
@@ -57,6 +58,10 @@ def get_affine_transform(center,
     else:
         trans = cv2.getAffineTransform(np.float32(src), np.float32(dst))
 
+    '''print("src ", src)
+    print("dst ", dst)
+    print("return trans", trans.shape)
+    print("trans", trans)'''
     return trans
 
 
@@ -91,6 +96,14 @@ def crop(img, center, scale, output_size, rot=0):
 
     return dst_img
 
+def draw_ct_heatmap(heatmap, center, grid_size):
+    mu_x = int(center[0])
+    mu_y = int(center[1])
+    w, h = heatmap.shape[0], heatmap.shape[1]
+    ul = [mu_x, mu_y]
+    br = [mu_x + grid_size, mu_y + grid_size]
+    heatmap[int(ul[0]): int(br[0]), int(ul[1]): int(br[1])] = 1
+    return heatmap
 
 def gaussian_radius(det_size, min_overlap=0.7):
   height, width = det_size

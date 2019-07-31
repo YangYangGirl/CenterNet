@@ -50,7 +50,8 @@ class opts(object):
                              help='not display time during training.')
     self.parser.add_argument('--save_all', action='store_true',
                              help='save model to disk every 5 epochs.')
-    self.parser.add_argument('--metric', default='loss', 
+    # yy write old version:loss
+    self.parser.add_argument('--metric', default='ct_exist_loss', 
                              help='main metric to save best model')
     self.parser.add_argument('--vis_thresh', type=float, default=0.3,
                              help='visualization threshold.')
@@ -58,16 +59,16 @@ class opts(object):
                              choices=['white', 'black'])
     
     # model
-    self.parser.add_argument('--arch', default='pln', 
+    self.parser.add_argument('--arch', default="plnres_18", 
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass | pln')
+                                  'dlav0_34 | dla_34 | hourglass | pln | plnres')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
                                   '-1 for default setting: '
                                   '64 for resnets and 256 for dla.')
-    self.parser.add_argument('--down_ratio', type=int, default=4,
+    self.parser.add_argument('--down_ratio', type=int, default=32,
                              help='output stride. Currently only supports 4.')
 
     # input
@@ -152,6 +153,10 @@ class opts(object):
     self.parser.add_argument('--mse_loss', action='store_true',
                              help='use mse loss or focal loss to train '
                                   'keypoint heatmaps.')
+    # plnCtdet
+    self.parser.add_argument('--grid_size', default=14, help='gird size in point linking net')
+    self.parser.add_argument('--ct_nopt_weight', default=1, help='weight')
+    self.parser.add_argument('--ct_pt_weight', default=1, help='weight')
     # ctdet
     self.parser.add_argument('--reg_loss', default='l1',
                              help='regression loss: sl1 | l1 | l2')
@@ -320,7 +325,10 @@ class opts(object):
                    'wh': 2 if not opt.cat_spec_wh else 2 * opt.num_classes}
       if opt.reg_offset:
         opt.heads.update({'reg': 2})
-    elif opt.task == 'plnCtdet':
+    elif opt.task == 'pln':
+      # assert opt.dataset in ['pascal', 'coco']
+      opt.heads = {'ct': opt.num_classes}
+    elif opt.task == 'plnres':
       # assert opt.dataset in ['pascal', 'coco']
       opt.heads = {'ct': opt.num_classes}
     elif opt.task == 'multi_pose':

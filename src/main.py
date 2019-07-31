@@ -27,10 +27,10 @@ def main(opt):
 
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.device = torch.device('cuda' if opt.gpus[0] >= 0 else 'cpu')
-  
   print('Creating model...')
   model = create_model(opt.arch, opt.heads, opt.head_conv)
-  optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+  #optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+  optimizer = torch.optim.RMSprop(model.parameters(), alpha=0.9, lr=opt.lr)
   start_epoch = 0
   if opt.load_model != '':
     model, optimizer, start_epoch = load_model(
@@ -39,7 +39,6 @@ def main(opt):
   Trainer = train_factory[opt.task]
   trainer = Trainer(opt, model, optimizer)
   trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
-
   print('Setting up data...')
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 
@@ -68,6 +67,7 @@ def main(opt):
   for epoch in range(start_epoch + 1, opt.num_epochs + 1):
     mark = epoch if opt.save_all else 'last'
     log_dict_train, _ = trainer.train(epoch, train_loader)
+    print("trainer.train over!!!!!!!!")
     logger.write('epoch: {} |'.format(epoch))
     for k, v in log_dict_train.items():
       logger.scalar_summary('train_{}'.format(k), v, epoch)

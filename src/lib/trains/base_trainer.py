@@ -69,6 +69,7 @@ class BaseTrainer(object):
       
       #print(batch['hm'].cpu().numpy().size)  32* 20 * 96* 96
       output, loss, loss_stats = model_with_loss(batch)
+
       loss = loss.mean() # mean of two
       if phase == 'train':
         self.optimizer.zero_grad()
