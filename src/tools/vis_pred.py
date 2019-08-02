@@ -67,9 +67,12 @@ if __name__ == '__main__':
   dets = []
   img_ids = coco.getImgIds()
   num_images = len(img_ids)
+  print("len(sys.argv)", len(sys.argv))
   for k in range(1, len(sys.argv)):
     pred_path = sys.argv[k]
     dets.append(coco.loadRes(pred_path))
+    print("pred_path", pred_path)
+    print("coco.loadRes(pred_path)", coco.loadRes(pred_path))
   # import pdb; pdb.set_trace()
   for i, img_id in enumerate(img_ids):
     img_info = coco.loadImgs(ids=[img_id])[0]
@@ -92,10 +95,10 @@ if __name__ == '__main__':
         cat_id = pred['category_id']
         if sc > 0.2:
           pred_img = add_box(pred_img, bbox, sc, cat_id)
-      cv2.imshow('pred{}'.format(k), pred_img)
-      # cv2.imwrite('vis/{}_pred{}.png'.format(i, k), pred_img)
-    cv2.imshow('gt', gt_img)
-    # cv2.imwrite('vis/{}_gt.png'.format(i), gt_img)
+      #cv2.imshow('pred{}'.format(k), pred_img)
+      cv2.imwrite('vis/{}_pred{}.png'.format(i, k), pred_img)
+    #cv2.imshow('gt', gt_img)
+    cv2.imwrite('vis/{}_gt.png'.format(i), gt_img)
     cv2.waitKey()
   # coco_eval.evaluate()
   # coco_eval.accumulate()

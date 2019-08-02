@@ -344,11 +344,12 @@ class PlnResNet(nn.Module):
         x = x + self.dil7(x)
         print("after dila7 x shape", x.shape)'''
         x = x.permute(0, 2, 3, 1)
+        x = torch.sigmoid(x)
         z = {}
         for head in self.heads:
             z[head] = x    
         return [z]
-        
+    
     def init_weights(self, num_layers):
         if 1:
             url = model_urls['resnet{}'.format(num_layers)]

@@ -53,8 +53,6 @@ class plnresCtdetLoss(torch.nn.Module):
             for i in range(len(output)):
                 gt = batch['ct'][i].contiguous().view(-1)
                 pred = output['ct'][:, :, :, 0][i].contiguous().view(-1)
-                print("===== pred ======")
-                print(pred)
                 pos_inds = gt.eq(1).float()
                 neg_inds = gt.lt(1).float()
                 num_pos = pos_inds.sum()
@@ -66,11 +64,6 @@ class plnresCtdetLoss(torch.nn.Module):
                 pred_neg = pred_neg.sort(descending=True)   
                 if num_pos == 0:
                     num_pos = 1         
-                print("================")      
-                print("num_pos", num_pos)
-                print("num_neg", num_neg)  
-                print("======   =======")
-                print(pred_neg[0][0: num_neg.int()]) 
                 ct_pt_loss += (((pred - 1) ** 2) * pos_inds).sum()  / self.opt.num_stacks / num_pos
                 ct_nopt_loss += (pred_neg[0][0: num_neg.int()] ** 2).sum() / self.opt.num_stacks / num_pos
         ct_exist_loss = self.opt.ct_pt_weight * ct_pt_loss + self.opt.ct_nopt_weight * ct_nopt_loss

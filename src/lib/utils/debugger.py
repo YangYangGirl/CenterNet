@@ -5,6 +5,8 @@ from __future__ import print_function
 import numpy as np
 import cv2
 from .ddd_utils import compute_box_3d, project_to_image, draw_box_3d
+import time
+from datetime import datetime
 
 class Debugger(object):
   def __init__(self, ipynb=False, theme='black', 
@@ -14,6 +16,7 @@ class Debugger(object):
       import matplotlib.pyplot as plt
       self.plt = plt
     self.imgs = {}
+    self.index = 0
     self.theme = theme
     colors = [(color_list[_]).astype(np.uint8) \
             for _ in range(len(color_list))]
@@ -212,12 +215,15 @@ class Debugger(object):
                                        points[i][j][1] * self.down_ratio),
                    3, (int(c[0]), int(c[1]), int(c[2])), -1)
 
-  def show_all_imgs(self, pause=False, time=0):
+  def show_all_imgs(self, pause=False): #, time=0):
     if not self.ipynb:
       for i, v in self.imgs.items():
         #cv2.imshow('{}'.format(i), v)
         print("write not ipynb img")
-        cv2.imwrite("../visDemo/" + '{}.png'.format(i), v)
+        time_str = time.strftime('%m-%d-%H-%M-%S-%f')
+        
+        cv2.imwrite("../visDemo/" + '{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])  + '{}.png'.format(i), v)
+        self.index += 1
       if cv2.waitKey(0 if pause else 1) == 27:
         import sys
         sys.exit(0)

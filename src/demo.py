@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import _init_paths
+import numpy as np
 
 import os
 import cv2
@@ -46,7 +47,6 @@ def demo(opt):
               image_names.append(os.path.join(opt.demo, file_name))
     else:
       image_names = [opt.demo]
-    
     for (image_name) in image_names:
       print("begin detector run")
       print("detector", image_name)
