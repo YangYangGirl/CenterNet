@@ -27,8 +27,10 @@ def main(opt):
 
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.device = torch.device('cuda' if opt.gpus[0] >= 0 else 'cpu')
+  #print("opt.device", opt.device)
   print('Creating model...')
   model = create_model(opt.arch, opt.heads, opt.head_conv)
+  #print("model.device()", next(model.parameters()).is_cuda)
   #optimizer = torch.optim.Adam(model.parameters(), opt.lr)
   optimizer = torch.optim.RMSprop(model.parameters(), alpha=0.9, lr=opt.lr)
   start_epoch = 0
@@ -39,6 +41,7 @@ def main(opt):
   Trainer = train_factory[opt.task]
   trainer = Trainer(opt, model, optimizer)
   trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
+  #print("model.device()", next(model.parameters()).is_cuda) 
   print('Setting up data...')
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 

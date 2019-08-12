@@ -224,7 +224,27 @@ class PlnResNet(nn.Module):
         self.dil5 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=16, padding=16)
         self.dil6 = nn.Conv2d(204, 204, 3, stride=1, bias=False, dilation=1, padding=1)
         self.dil7 = nn.Conv2d(204, 204, 1, stride=1, bias=False, dilation=1)
+       
+        self.branch1 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, bias=False, padding=1),
+            nn.Conv2d(64, 988, kernel_size=3, stride=1, bias=False, padding=1)
+        )
+
+        self.branch2 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, bias=False, padding=1),
+            nn.Conv2d(64, 988, kernel_size=3, stride=1, bias=False, padding=1)
+        )
+ 
+        self.branch3 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, bias=False, padding=1),
+            nn.Conv2d(64, 988, kernel_size=3, stride=1, bias=False, padding=1)
+        )
         
+        self.branch4 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, bias=False, padding=1),
+            nn.Conv2d(64, 988, kernel_size=3, stride=1, bias=False, padding=1)
+        )
+ 
         for head in self.heads:
             classes = self.heads[head]
             if head_conv > 0:
@@ -328,12 +348,24 @@ class PlnResNet(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
+        end_points = {}
         #print("after res18 x shape", x.shape) #14 * 14 * 512 
         x = self.deconv_layers(x)
         #print("after deconv x shape", x.shape) #112 * 112 * 64
-        x = self.convadd1(x)
-        x = self.convadd2(x)
-        #print("after conv x shape", x.shape)
+        branch_list = ['det_lt', 'det_rt', 'det_lb', 'det_rb']
+        for k, branch in enumerate(branch_list):
+            if k == 0:
+                x_branch = self.branch1(x)
+            elif k == 1:
+                x_branch = self.branch2(x)
+            elif k == 2:
+                x_branch = self.branch3(x)
+            elif k == 3:
+                x_branch = self.branch4(x)
+            x_branch = x_branch.permute(0, 2, 3, 1)
+            x_branch = torch.sigmoid(x_branch)
+            end_points[branch] = x_branch
+
         '''x = self.dil1(x)
         print("after dil1  x shape", x.shape)
         x = x + self.dil2(x)
@@ -343,12 +375,12 @@ class PlnResNet(nn.Module):
         x = x + self.dil6(x)
         x = x + self.dil7(x)
         print("after dila7 x shape", x.shape)'''
-        x = x.permute(0, 2, 3, 1)
-        x = torch.sigmoid(x)
-        z = {}
+        '''z = {}
         for head in self.heads:
             z[head] = x    
-        return [z]
+        return [z] '''
+        return torch.cat([end_points[x] for x in branch_list], dim=0)
+        #return [end_points[x] for x in branch_list]
     
     def init_weights(self, num_layers):
         if 1:

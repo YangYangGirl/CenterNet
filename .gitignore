@@ -1,3 +1,5 @@
+*.png
+*.swp
 legacy/*
 .DS_Store
 debug/*

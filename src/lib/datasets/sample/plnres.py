@@ -27,7 +27,7 @@ class plnresCTDetDataset(data.Dataset):
         while size - border // i <= border // i:
             i *= 2
         return border // i
-
+   
     def __getitem__(self, index):
         img_id = self.images[index]
         file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
@@ -106,6 +106,62 @@ class plnresCTDetDataset(data.Dataset):
                                ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
 
         gt_det = np.array(gt_det)
-        ret = {'input': inp, 'ct': gt_ct}
+        #ret = {'input': inp, 'ct': gt_ct}
+        
+        channels = 3 + output_h + output_w + num_classes
+        shape = (output_h, output_w, channels * 2)
+        multilabels = [np.zeros(shape).astype(np.float32) for _ in range(4)]
+        ss = [(-2, -2), (+2, -2), (-2, +2), (+2, +2)]
+ 
+        for k in range(4):
+            for i in range(num_objs):
+                ann = anns[i]
+                bbox = self._coco_box_to_bbox(ann['bbox'])
+                bbox[0] /= width
+                bbox[2] /= width
+                bbox[1] /= height
+                bbox[3] /= height
+                
+                if (bbox[2] < 0.01 or bbox[3] < 0.01):
+                    continue 
+                cat = int(self.cat_ids[ann['category_id']])
+                xm, ym = bbox[:2]
+                bbox[2] = bbox[2] - bbox[0]
+                bbox[3] = bbox[3] - bbox[1]
+                xc = bbox[0] + bbox[2] / ss[k][0]
+                yc = bbox[1] + bbox[3] / ss[k][1]
+            
+                colm = int(xm * output_w)
+                rowm = int(ym * output_h)
+                colc = int(xc * output_w)
+                rowc = int(yc * output_h)
+                
+                if colm == output_w: colm -= 1
+                if rowm == output_h: rowm -= 1
+                if colc == output_w: colc -= 1
+                if rowc == output_h: rowc -= 1
 
+                if ((multilabels[k][rowm, colm, 0] != 0) or (multilabels[k][rowc, colc, 1] != 0)):
+                    continue                
+                 
+                xm = xm * output_w - colm
+                ym = ym * output_h - rowm
+                xc = xc * output_w - colc
+                yc = yc * output_h - rowc
+ 
+                multilabels[k][rowm, colm, 0] = 1.0
+                multilabels[k][rowm, colm, 2] = xm
+                multilabels[k][rowm, colm, 3] = ym
+                multilabels[k][rowm, colm, 6+rowc] = 1.0
+                multilabels[k][rowm, colm, 6+output_h+colc] = 1.0
+                multilabels[k][rowm, colm, 6+2*output_h+2*output_w+cat] = 1.0
+                multilabels[k][rowc, colc, 1] = 1.0
+                multilabels[k][rowc, colc, 4] = xc
+                multilabels[k][rowc, colc, 5] = yc
+                multilabels[k][rowc, colc, 6+output_h+output_w+rowm] = 1.0
+                multilabels[k][rowc, colc, 6+2*output_h+output_w+colm] = 1.0
+                multilabels[k][rowc, colc, 6+2*output_h+2*output_w+num_classes+cat] = 1.0               
+        
+        ret = {'input': inp, 'gt': np.array(multilabels), 'ct': gt_ct}
         return ret
+

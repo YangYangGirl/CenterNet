@@ -154,6 +154,16 @@ class opts(object):
                              help='use mse loss or focal loss to train '
                                   'keypoint heatmaps.')
     # plnCtdet
+    self.parser.add_argument('--object_scale', default=1.0, help='Object scale of convbox loss')
+    self.parser.add_argument('--noobject_scale', default=0.3, help='Noobject scale of convbox loss')
+    self.parser.add_argument('--connection_scale', default=1.0, help='Class scale of convbox loss')
+    self.parser.add_argument('--coord_scale', default=5.0, help='Coord scale of convbox loss')
+    self.parser.add_argument('--class_scale', default=1.0, help='Class scale of convbox loss')
+    self.parser.add_argument('--num_box', default=2, help='Number of box of convbox loss')
+    self.parser.add_argument('--output_row', default=112, help='')
+    self.parser.add_argument('--output_col', default=112, help='')
+    self.parser.add_argument('--num_class', default=20, help='')
+
     self.parser.add_argument('--grid_size', default=14, help='gird size in point linking net')
     self.parser.add_argument('--ct_nopt_weight', default=1, help='weight')
     self.parser.add_argument('--ct_pt_weight', default=1, help='weight')
@@ -329,8 +339,10 @@ class opts(object):
       # assert opt.dataset in ['pascal', 'coco']
       opt.heads = {'ct': opt.num_classes}
     elif opt.task == 'plnres':
+      print("yy test")
+      opt.heads = {}
       # assert opt.dataset in ['pascal', 'coco']
-      opt.heads = {'ct': opt.num_classes}
+      #opt.heads = {'ct': opt.num_classes}
     elif opt.task == 'multi_pose':
       # assert opt.dataset in ['coco_hp']
       opt.flip_idx = dataset.flip_idx
@@ -348,6 +360,9 @@ class opts(object):
 
   def init(self, args=''):
     default_dataset_info = {
+      'plnres': {'default_resolution': [448, 448], 'num_classes': 20,
+                'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
+                'dataset': 'pascal'},
       'ctdet': {'default_resolution': [512, 512], 'num_classes': 80, 
                 'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                 'dataset': 'coco'},
