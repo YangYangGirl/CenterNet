@@ -6,6 +6,104 @@ import torch
 import torch.nn as nn
 from .utils import _gather_feat, _tranpose_and_gather_feat
 
+    
+def get_range(i, rows, ss):
+    if i < rows/2:
+        if ss < 0:
+            return 0, i + 1
+        else:
+            return i, 2*(i + 1)
+    else:
+        if ss < 0:
+            return 2*i - rows, i + 1
+        else:
+            return i, rows
+
+def plnres_decode(output):
+    num_class = 20
+    output_row = output.size(1)
+    output_col = output.size(2)
+    print("output_row, output_col", output_row, output_col)
+    num_box = 2
+    ss = [(-1, -1), (+1, -1), (-1, +1), (+1, +1)]
+    boxes = [[[] for _ in range(num_class)] for _ in range(1)]
+
+    for k in range(1):
+        det = output[k]
+        for i in range(output_row):
+            for j in range(output_col):
+                p_start, p_end = get_range(i, output_row, ss[k][1])
+                q_start, q_end = get_range(j, output_col, ss[k][0])
+                for p in range(p_start, p_end):
+                    for q in range(q_start, q_end):
+                        for n in range(num_box):
+
+                            pm = det[i, j, n]
+                            pc = det[p, q, num_box + n]
+                            pconnm = det[i, j, num_box * 6 \
+                                         + n * (output_row + output_col) + p] \
+                                     * det[i, j, num_box * 6 \
+                                           + n * (output_row + output_col) + output_row + q]
+                            pconnc = det[p, q, num_box * 6 \
+                                         + (num_box + n) * (output_row + output_col) + i] \
+                                     * det[p, q, num_box * 6 \
+                                           + (num_box + n) * (
+                                                   output_row + output_col) + output_row + j]
+                            score_part = pm * pc * (pconnm + pconnc) / 2.0
+                            if score_part < 0.001:
+                                continue
+
+                            xm = (det[i, j, (num_box + n) * 2 + 0] + j) / output_col #* datum[1][1][0]
+                            ym = (det[i, j, (num_box + n) * 2 + 1] + i) / output_row #* datum[1][1][1]
+                            xc = (det[p, q, (num_box * 2 + n) * 2 + 0] + q) / output_col #* datum[1][1][0]
+                            yc = (det[p, q, (num_box * 2 + n) * 2 + 1] + p) / output_row #* datum[1][1][1]
+
+                            w_2 = ss[k][0] * (xc - xm)
+                            h_2 = ss[k][1] * (yc - ym)
+                            x1 = xm - w_2;
+                            y1 = ym - h_2
+                            x2 = xm + w_2;
+                            y2 = ym + h_2
+
+                            for cls in range(num_class):
+                                pclsm = det[i, j, num_box * (6 + 2 * (output_row + output_col)) \
+                                            + n * num_class + cls]
+                                pclsc = det[
+                                    p, q, num_box * (
+                                                6 + 2 * (output_row + output_col) + num_class) \
+                                    + n * num_class + cls]
+
+                                score = score_part * pclsm * pclsc
+                                if score < 0.001:
+                                    continue
+                                boxes[k][cls].append([x1, y1, x2, y2, score]) 
+    for k in range(4):
+        tmp = [np.float32(x) for x in boxes[k]]
+        res = apply_nms(tmp, 0.5, int(0))
+        res_list.append(res)
+
+    boxes = [boxes[0][i] + boxes[1][i] + boxes[2][i] + boxes[3][i] for i in range(20)]
+    boxes = [np.float32(x) for x in boxes]
+    res = apply_nms(boxes, 0.5, int(0))
+    res_list.append(res)
+
+    return res_list
+
+def apply_nms(boxes, nms_thresh, nms_theta, nms_sigma, conf_thresh, gpu_id):  
+    res = []
+    for cls_ind in range(FLAGS.num_class):
+        if boxes[cls_ind].size == 0:
+            res.append(np.zeros((0, 5), dtype=np.float32))
+            continue
+        cls_scores = boxes[cls_ind][:, 4]
+        keep = np.where(cls_scores >= conf_thresh)[0]
+        dets = boxes[cls_ind][keep, :]
+        # keep = nms(dets, nms_thresh, gpu_id)
+        keep = soft_nms(dets, nms_thresh, nms_theta, nms_sigma, conf_thresh, 1)
+        res.append(dets[keep, :])
+                
+    return res
+
 def pln_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
     batch, cat, height, width = heat.size()
 
