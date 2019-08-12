@@ -8,6 +8,8 @@ from progress.bar import Bar
 import time
 import torch
 
+from datetime import datetime
+
 from external.nms import soft_nms
 from models.decode import plnres_decode
 from models.utils import flip_tensor
@@ -17,14 +19,29 @@ from utils.debugger import Debugger
 
 from .base_detector import BaseDetector
 
-
 class PlnresDetector(BaseDetector):
     def __init__(self, opt):
         super(PlnresDetector, self).__init__(opt)
 
     def process(self, images, return_time=False):
         with torch.no_grad():
+            time_str = time.strftime('%m-%d-%H-%M-%S-%f')
+            visimage = images[0].cpu().numpy()
+            visimage = visimage.transpose(1, 2, 0)
+            #visimage = canny(visimage)
+            cv2.imwrite("./vis_ct/" + '{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visimage)
             output = self.model(images)
+            pred_ct = np.zeros((3, 112, 112), np.uint8)
+            #pred_ct.fill(255)
+
+            pred_ct[0] = output[0][:, :, 0] * 255
+            pred_ct[1] = output[0][:, :, 0] * 255
+            pred_ct[2] = output[0][:, :, 0] * 255
+
+            visct = pred_ct.transpose(1, 2, 0)
+            visct = 255 - visct
+            visct = cv2.resize(visct, (448, 448), interpolation=cv2.INTER_CUBIC)
+            cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
             torch.cuda.synchronize()
             forward_time = time.time()
             dets = plnres_decode(output)
@@ -33,6 +50,27 @@ class PlnresDetector(BaseDetector):
             return output, dets, forward_time
         else:
             return output, dets
+
+    def process_ct(self, images, return_time=False):
+        with torch.no_grad():
+            time_str = time.strftime('%m-%d-%H-%M-%S-%f')
+            visimage = images[0].cpu().numpy()
+            visimage = visimage.transpose(1, 2, 0)
+            #visimage = canny(visimage)
+            output = self.model(images)
+            pred_ct = np.zeros((3, 112, 112), np.uint8)
+            #pred_ct.fill(255)
+
+            pred_ct[0] = output[0][:, :, 0] * 255
+            pred_ct[1] = output[0][:, :, 0] * 255
+            pred_ct[2] = output[0][:, :, 0] * 255
+
+            visct = pred_ct.transpose(1, 2, 0)
+            visct = 255 - visct
+            visct = cv2.resize(visct, (448, 448), interpolation=cv2.INTER_CUBIC)
+            cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
+            torch.cuda.synchronize()
+            forward_time = time.time()
 
     def post_process(self, dets, meta, scale=1):
         dets = dets.detach().cpu().numpy()

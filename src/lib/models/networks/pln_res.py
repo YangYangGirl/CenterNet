@@ -379,8 +379,9 @@ class PlnResNet(nn.Module):
         for head in self.heads:
             z[head] = x    
         return [z] '''
-        return torch.cat([end_points[x] for x in branch_list], dim=0)
-        #return [end_points[x] for x in branch_list]
+        for x in branch_list:
+            end_points[x] = end_points[x].unsqueeze(0)
+        return torch.cat(([end_points[x] for x in branch_list]), dim=0)
     
     def init_weights(self, num_layers):
         if 1:

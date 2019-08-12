@@ -8,6 +8,7 @@ from progress.bar import Bar
 import time
 import torch
 
+from datetime import datetime
 from models.model import create_model, load_model
 from utils.image import get_affine_transform
 from utils.debugger import Debugger
@@ -80,6 +81,45 @@ class BaseDetector(object):
 
   def show_results(self, debugger, image, results):
    raise NotImplementedError
+
+
+  def run_ct(self, image_or_path_or_tensor, meta=None):
+    load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
+    merge_time, tot_time = 0, 0
+    debugger = Debugger(dataset=self.opt.dataset, ipynb=(self.opt.debug == 3),
+                        theme=self.opt.debugger_theme)
+    start_time = time.time()
+    pre_processed = False
+    if isinstance(image_or_path_or_tensor, np.ndarray):
+      image = image_or_path_or_tensor
+    elif type(image_or_path_or_tensor) == type(''):
+      image = cv2.imread(image_or_path_or_tensor)
+    else:
+      image = image_or_path_or_tensor['image'][0].numpy()
+      pre_processed_images = image_or_path_or_tensor
+      pre_processed = True
+
+    vis_raw = cv2.resize(image, (448, 448), interpolation=cv2.INTER_CUBIC)
+    cv2.imwrite("./vis_ct/" + 'raw_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", vis_raw)
+    loaded_time = time.time()
+    load_time += (loaded_time - start_time)
+
+    detections = []
+    for scale in self.scales:
+      scale_start_time = time.time()
+      if not pre_processed:
+        images, meta = self.pre_process(image, scale, meta)
+      else:
+        # import pdb; pdb.set_trace()
+        images = pre_processed_images['images'][scale][0]
+        meta = pre_processed_images['meta'][scale]
+        meta = {k: v.numpy()[0] for k, v in meta.items()}
+      images = images.to(self.opt.device)
+      torch.cuda.synchronize()
+      pre_process_time = time.time()
+      pre_time += pre_process_time - scale_start_time
+      self.process_ct(images, return_time=True)
+      torch.cuda.synchronize()
 
   def run(self, image_or_path_or_tensor, meta=None):
     load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
