@@ -50,7 +50,6 @@ def main(opt):
       num_workers=1,
       pin_memory=True
   )
-
   if opt.test:
     _, preds = trainer.val(0, val_loader)
     val_loader.dataset.run_eval(preds, opt.save_dir)

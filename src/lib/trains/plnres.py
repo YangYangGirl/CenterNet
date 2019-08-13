@@ -265,9 +265,8 @@ class plnresCtdetLoss(torch.nn.Module):
         ct_pt_loss = 0
         ct_nopt_loss = 0
         for s in range(opt.num_stacks):
-            outputs = outputs[0]
             for i in range(len(outputs)):
-                output = outputs[i].to(self.opt.device)
+                output = outputs[i][0].to(self.opt.device)
                 gt = batch['ct'][i].contiguous().view(-1)
                 pred = output[ :, :, 0].contiguous().view(-1)
                 pos_inds = gt.eq(1).float()

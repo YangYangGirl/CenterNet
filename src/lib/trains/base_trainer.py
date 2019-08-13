@@ -62,12 +62,10 @@ class BaseTrainer(object):
       if iter_id >= num_iters:
         break
       data_time.update(time.time() - end)
-
       for k in batch:
         if k != 'meta':
           batch[k] = batch[k].to(device=opt.device, non_blocking=True)    
-      
-      #print(batch['hm'].cpu().numpy().size)  32* 20 * 96* 96
+      #print("-----batch['ct']---size----", batch['ct'].cpu().numpy().size)#  32* 20 * 96* 96
       output, loss, loss_stats = model_with_loss(batch)
 
       loss = loss.mean() # mean of two
