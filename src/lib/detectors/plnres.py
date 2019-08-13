@@ -59,16 +59,28 @@ class PlnresDetector(BaseDetector):
             #visimage = canny(visimage)
             output = self.model(images)
             pred_ct = np.zeros((3, 112, 112), np.uint8)
-            #pred_ct.fill(255)
-
-            pred_ct[0] = output[0][:, :, 0] * 255
-            pred_ct[1] = output[0][:, :, 0] * 255
-            pred_ct[2] = output[0][:, :, 0] * 255
+            pred_ct[0] = output[0][0][:, :, 0] * 255
+            pred_ct[1] = output[0][0][:, :, 0] * 255
+            pred_ct[2] = output[0][0][:, :, 0] * 255
 
             visct = pred_ct.transpose(1, 2, 0)
             visct = 255 - visct
             visct = cv2.resize(visct, (448, 448), interpolation=cv2.INTER_CUBIC)
             cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
+
+            '''
+            test = np.zeros((3, 112, 112), np.uint8)
+            test[:, 5, 5] = 255
+            test[:, 20:25, 20:25] = 100
+            test[:, 35:40, 35:40] = 40
+            test[:, 105:112, 105:112] = 255
+            test = test.transpose(1, 2, 0)
+            test = 255 - test
+            
+            test = cv2.resize(test, (448, 448), interpolation=cv2.INTER_CUBIC)
+            cv2.imwrite("./vis_ct/" + 'test_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", test)
+            '''
+
             torch.cuda.synchronize()
             forward_time = time.time()
 

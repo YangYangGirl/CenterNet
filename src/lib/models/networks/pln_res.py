@@ -381,7 +381,7 @@ class PlnResNet(nn.Module):
         return [z] '''
         for x in branch_list:
             end_points[x] = end_points[x].unsqueeze(0)
-        return torch.cat(([end_points[x] for x in branch_list]), dim=0)
+        return torch.cat(([end_points[x] for x in branch_list]), dim=0).permute(1, 0, 2, 3, 4)
     
     def init_weights(self, num_layers):
         if 1:
