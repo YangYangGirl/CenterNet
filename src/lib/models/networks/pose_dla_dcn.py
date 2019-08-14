@@ -470,7 +470,6 @@ class DLASeg(nn.Module):
     def forward(self, x):
         x = self.base(x)
         x = self.dla_up(x)
-        print("--------------- x device -----------------", x[0].device)
         y = []
         for i in range(self.last_level - self.first_level):
             y.append(x[i].clone())

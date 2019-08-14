@@ -106,8 +106,8 @@ class custom_build_ext(build_ext):
 
 ext_modules = [
     Extension(
-        "convbox.convbox_match",
-        ["test/test.pyx"],
+        "convbox.cython_convbox_match",
+        ["convbox/convbox_match.pyx"],
         extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs = [numpy_include]
     ),

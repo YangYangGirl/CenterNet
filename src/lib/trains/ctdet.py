@@ -32,7 +32,6 @@ class CtdetLoss(torch.nn.Module):
       output = outputs[s]
       if not opt.mse_loss:
         output['hm'] = _sigmoid(output['hm'])
-
       if opt.eval_oracle_hm:
         output['hm'] = batch['hm']
       if opt.eval_oracle_wh:
@@ -46,7 +45,6 @@ class CtdetLoss(torch.nn.Module):
           batch['ind'].detach().cpu().numpy(), 
           output['reg'].shape[3], output['reg'].shape[2])).to(opt.device)
     
-      print("output['hm'].shape, batch['hm'].shape", output['hm'].shape, batch['hm'].shape)
       hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
       if opt.wh_weight > 0:
         if opt.dense_wh:
@@ -68,10 +66,14 @@ class CtdetLoss(torch.nn.Module):
         off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                              batch['ind'], batch['reg']) / opt.num_stacks
         
-    loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + \
+    '''loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + \
            opt.off_weight * off_loss
     loss_stats = {'loss': loss, 'hm_loss': hm_loss,
                   'wh_loss': wh_loss, 'off_loss': off_loss}
+    return loss, loss_stats
+    '''
+    loss = hm_loss 
+    loss_stats = {'loss': loss, 'hm_loss': hm_loss}
     return loss, loss_stats
 
 class CtdetTrainer(BaseTrainer):
@@ -79,7 +81,8 @@ class CtdetTrainer(BaseTrainer):
     super(CtdetTrainer, self).__init__(opt, model, optimizer=optimizer)
   
   def _get_losses(self, opt):
-    loss_states = ['loss', 'hm_loss', 'wh_loss', 'off_loss']
+    #loss_states = ['loss', 'hm_loss', 'wh_loss', 'off_loss']
+    loss_states = ['loss', 'hm_loss']
     loss = CtdetLoss(opt)
     return loss_states, loss
 
