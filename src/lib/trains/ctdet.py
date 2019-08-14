@@ -45,7 +45,8 @@ class CtdetLoss(torch.nn.Module):
           batch['reg'].detach().cpu().numpy(), 
           batch['ind'].detach().cpu().numpy(), 
           output['reg'].shape[3], output['reg'].shape[2])).to(opt.device)
-
+    
+      print("output['hm'].shape, batch['hm'].shape", output['hm'].shape, batch['hm'].shape)
       hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
       if opt.wh_weight > 0:
         if opt.dense_wh:

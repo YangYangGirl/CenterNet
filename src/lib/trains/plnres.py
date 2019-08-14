@@ -264,8 +264,10 @@ class plnresCtdetLoss(torch.nn.Module):
         ct_exist_loss = 0
         ct_pt_loss = 0
         ct_nopt_loss = 0
+        
         for s in range(opt.num_stacks):
             for i in range(len(outputs)):
+                num_batch = len(outputs)
                 output = outputs[i][0].to(self.opt.device)
                 gt = batch['ct'][i].contiguous().view(-1)
                 pred = output[ :, :, 0].contiguous().view(-1)
@@ -280,8 +282,8 @@ class plnresCtdetLoss(torch.nn.Module):
                 pred_neg = pred_neg.sort(descending=True)
                 if num_pos == 0:
                     num_pos = 1
-                ct_pt_loss += (((pred - 1) ** 2) * pos_inds).sum()  / self.opt.num_stacks / num_pos
-                ct_nopt_loss += (pred_neg[0][0: num_neg.int()] ** 2).sum() / self.opt.num_stacks / num_pos
+                ct_pt_loss += (((pred - 1) ** 2) * pos_inds).sum()  / self.opt.num_stacks / num_pos / num_batch
+                ct_nopt_loss += (pred_neg[0][0: num_neg.int()] ** 2).sum() / self.opt.num_stacks / num_pos / num_batch
         ct_exist_loss = self.opt.ct_pt_weight * ct_pt_loss + self.opt.ct_nopt_weight * ct_nopt_loss
 
         loss_stats = {'ct_exist_loss': ct_exist_loss, 'ct_pt_loss': ct_pt_loss,
