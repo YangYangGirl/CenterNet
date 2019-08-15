@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from datetime import datetime
 import cv2
 import numpy as np
 from progress.bar import Bar
@@ -20,7 +21,25 @@ from .base_detector import BaseDetector
 class CtdetDetector(BaseDetector):
   def __init__(self, opt):
     super(CtdetDetector, self).__init__(opt)
-  
+
+  def process_ct(self, images, return_time=False):
+    with torch.no_grad():
+      output = self.model(images)[-1]
+      hm = output['hm'].sigmoid_().cpu().numpy()
+      pred_ct = np.zeros((3, 112, 112), np.uint8)
+      #pred_ct[0] = np.amax(hm[0], axis=0) * 255 #yellow
+      pred_ct[1] = np.amax(hm[0], axis=0) * 255 #red
+      #pred_ct[2] = np.amax(hm[0], axis=0) * 255 #blue
+      
+      visct = pred_ct.transpose(1, 2, 0)
+      visct = 255 - visct
+      visct = cv2.resize(visct, (448, 448), interpolation=cv2.INTER_CUBIC)
+      #cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
+ 
+      torch.cuda.synchronize()
+      forward_time = time.time()
+      return pred_ct[1]
+
   def process(self, images, return_time=False):
     with torch.no_grad():
       output = self.model(images)[-1]

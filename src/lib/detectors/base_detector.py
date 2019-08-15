@@ -98,7 +98,7 @@ class BaseDetector(object):
       image = image_or_path_or_tensor['image'][0].numpy()
       pre_processed_images = image_or_path_or_tensor
       pre_processed = True
-
+   
     vis_raw = cv2.resize(image, (448, 448), interpolation=cv2.INTER_CUBIC)
     cv2.imwrite("./vis_ct/" + 'raw_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", vis_raw)
     loaded_time = time.time()
@@ -118,7 +118,20 @@ class BaseDetector(object):
       torch.cuda.synchronize()
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
-      self.process_ct(images, return_time=True)
+      result_ct = self.process_ct(images, return_time=True)
+      print("image.shape", image.shape)
+      image = np.array(cv2.resize(image, (448, 448), interpolation=cv2.INTER_CUBIC))
+      '''white = np.ones((112, 112, 3)) * 255
+      vector = white-image
+      image = image + vector * 0.1'''
+      
+      add_ct = np.zeros((112, 112, 3), np.uint8)
+      add_ct[:, :, 2] = result_ct
+      add_ct = np.array(cv2.resize(add_ct, (448, 448), interpolation=cv2.INTER_CUBIC))
+      add_ct = add_ct * 0.7 + image * 0.3
+      #add_ct = cv2.resize(add_ct, (448, 448), interpolation=cv2.INTER_CUBIC)
+      cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", add_ct)
+
       torch.cuda.synchronize()
 
   def run(self, image_or_path_or_tensor, meta=None):
