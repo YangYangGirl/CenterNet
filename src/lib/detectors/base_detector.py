@@ -128,7 +128,7 @@ class BaseDetector(object):
       add_ct = np.zeros((112, 112, 3), np.uint8)
       add_ct[:, :, 2] = result_ct
       add_ct = np.array(cv2.resize(add_ct, (448, 448), interpolation=cv2.INTER_CUBIC))
-      add_ct = add_ct * 0.7 + image * 0.3
+      add_ct = add_ct * 0.7 + image * 0.9
       #add_ct = cv2.resize(add_ct, (448, 448), interpolation=cv2.INTER_CUBIC)
       cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", add_ct)
 
