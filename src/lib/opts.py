@@ -75,9 +75,9 @@ class opts(object):
     self.parser.add_argument('--input_res', type=int, default=-1, 
                              help='input height and width. -1 for default from '
                              'dataset. Will be overriden by input_h | input_w')
-    self.parser.add_argument('--input_h', type=int, default=448, 
+    self.parser.add_argument('--input_h', type=int, default=-1, #480
                              help='input height. -1 for default from dataset.')
-    self.parser.add_argument('--input_w', type=int, default=448, 
+    self.parser.add_argument('--input_w', type=int, default=-1, #480
                              help='input width. -1 for default from dataset.')
     
     # train
@@ -162,7 +162,7 @@ class opts(object):
     self.parser.add_argument('--num_box', default=2, help='Number of box of convbox loss')
     self.parser.add_argument('--output_row', default=112, help='')
     self.parser.add_argument('--output_col', default=112, help='')
-    self.parser.add_argument('--num_class', default=20, help='')
+    self.parser.add_argument('--num_class', default=1, help='')
 
     self.parser.add_argument('--grid_size', default=14, help='gird size in point linking net')
     self.parser.add_argument('--ct_nopt_weight', default=1, help='weight')
@@ -363,9 +363,12 @@ class opts(object):
       'plnres': {'default_resolution': [448, 448], 'num_classes': 20,
                 'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                 'dataset': 'pascal'},
-      'ctdet': {'default_resolution': [512, 512], 'num_classes': 20, 
+      'ctdet': {'default_resolution': [512, 512], 'num_classes': 1,
                 'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
-                'dataset': 'pascal'},
+                'dataset': 'face'},
+        # 'ctdet': {'default_resolution': [512, 512], 'num_classes': 1,
+        #           'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
+        #           'dataset': 'pascal'},
       'exdet': {'default_resolution': [512, 512], 'num_classes': 80, 
                 'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                 'dataset': 'coco'},

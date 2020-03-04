@@ -34,7 +34,7 @@ class CtdetDetector(BaseDetector):
       visct = pred_ct.transpose(1, 2, 0)
       visct = 255 - visct
       visct = cv2.resize(visct, (448, 448), interpolation=cv2.INTER_CUBIC)
-      #cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
+      cv2.imwrite("./vis_ct/" + 'pred_{}'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]) + ".png", visct)
  
       torch.cuda.synchronize()
       forward_time = time.time()

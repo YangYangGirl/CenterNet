@@ -47,6 +47,8 @@ class Debugger(object):
     elif num_classes == 80 or dataset == 'coco':
       self.names = coco_class_name
     elif num_classes == 20 or dataset == 'pascal':
+      print(dataset, num_classes)
+      print("!!!!!!yy debug !!!!!!!!!!!!")
       self.names = pascal_class_name
     elif dataset == 'gta':
       self.names = gta_class_name
@@ -65,6 +67,8 @@ class Debugger(object):
       self.focal_length = 721.5377
       self.W = 1242
       self.H = 375
+    elif num_classes == 1 or dataset == 'face':
+        self.names = face_class_name
     num_classes = len(self.names)
     self.down_ratio=down_ratio
     # for bird view
@@ -438,6 +442,8 @@ class Debugger(object):
                       lineType=cv2.LINE_AA)
     self.imgs[img_id] = bird_view
 
+#yy add
+face_class_name = ['face']
 
 kitti_class_name = [
   'p', 'v', 'b'
