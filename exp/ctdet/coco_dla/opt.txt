@@ -1,7 +1,7 @@
 ==> torch version: 1.1.0
 ==> cudnn version: 7501
 ==> Cmd:
-['test.py', '--task', 'ctdet', '--exp_id', 'coco_dla', '--keep_res', '--load_model', '../exp/ctdet/2/model_best.pth', '--dataset', 'face']
+['main.py', '--task', 'ctdet', '--dataset', 'face', '--exp_id', 'coco_dla', '--batch_size', '1', '--master_batch', '1', '--lr', '1.25e-4', '--gpus', '0', '--metric', 'loss', '--arch', 'dla_34']
 ==> Opt:
   K: 100
   aggr_weight: 0.0
@@ -9,10 +9,10 @@
   arch: dla_34
   aug_ddd: 0.5
   aug_rot: 0
-  batch_size: 32
+  batch_size: 1
   cat_spec_wh: False
   center_thresh: 0.1
-  chunk_sizes: [32]
+  chunk_sizes: [1]
   class_scale: 1.0
   connection_scale: 1.0
   coord_scale: 5.0
@@ -38,7 +38,7 @@
   eval_oracle_wh: False
   exp_dir: /home/yy/github/CenterNet/src/lib/../../exp/ctdet
   exp_id: coco_dla
-  fix_res: False
+  fix_res: True
   flip: 0.5
   flip_test: False
   gpus: [0]
@@ -51,17 +51,17 @@
   hm_hp_weight: 1
   hm_weight: 1
   hp_weight: 1
-  input_h: 384
-  input_res: 384
-  input_w: 384
-  keep_res: True
+  input_h: 640
+  input_res: 640
+  input_w: 640
+  keep_res: False
   kitti_split: 3dop
-  load_model: ../exp/ctdet/2/model_best.pth
+  load_model: 
   lr: 0.000125
   lr_step: [90, 120]
-  master_batch_size: 32
+  master_batch_size: 1
   mean: [[[0.485 0.456 0.406]]]
-  metric: ct_exist_loss
+  metric: loss
   mse_loss: False
   nms: False
   no_color_aug: False
@@ -84,10 +84,10 @@
   object_scale: 1.0
   off_weight: 1
   output_col: 112
-  output_h: 96
-  output_res: 96
+  output_h: 160
+  output_res: 160
   output_row: 112
-  output_w: 96
+  output_w: 160
   pad: 31
   peak_thresh: 0.2
   print_iter: 0

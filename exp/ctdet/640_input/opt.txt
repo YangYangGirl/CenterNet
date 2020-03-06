@@ -1,18 +1,18 @@
 ==> torch version: 1.1.0
 ==> cudnn version: 7501
 ==> Cmd:
-['main.py', '--task', 'ctdet', '--dataset', 'face', '--exp_id', 'coco_dla', '--batch_size', '32', '--master_batch', '32', '--lr', '1.25e-4', '--gpus', '1', '--metric', 'loss', '--exp_id', '640_input']
+['main.py', '--task', 'ctdet', '--dataset', 'face', '--exp_id', 'coco_dla', '--batch_size', '1', '--master_batch', '1', '--lr', '1.25e-4', '--gpus', '0', '--metric', 'loss', '--arch', 'mobile_5', '--exp_id', '640_input']
 ==> Opt:
   K: 100
   aggr_weight: 0.0
   agnostic_ex: False
-  arch: dla_34
+  arch: mobile_5
   aug_ddd: 0.5
   aug_rot: 0
-  batch_size: 32
+  batch_size: 1
   cat_spec_wh: False
   center_thresh: 0.1
-  chunk_sizes: [32]
+  chunk_sizes: [1]
   class_scale: 1.0
   connection_scale: 1.0
   coord_scale: 5.0
@@ -42,9 +42,9 @@
   flip: 0.5
   flip_test: False
   gpus: [0]
-  gpus_str: 1
+  gpus_str: 0
   grid_size: 14
-  head_conv: 256
+  head_conv: 64
   heads: {'hm': 1, 'wh': 2, 'reg': 2}
   hide_data_time: False
   hm_hp: True
@@ -59,7 +59,7 @@
   load_model: 
   lr: 0.000125
   lr_step: [90, 120]
-  master_batch_size: 32
+  master_batch_size: 1
   mean: [[[0.485 0.456 0.406]]]
   metric: loss
   mse_loss: False

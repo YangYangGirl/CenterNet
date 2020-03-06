@@ -14,6 +14,7 @@ from .networks.resnet_dcn import get_pose_net as get_pose_net_dcn
 from .networks.large_hourglass import get_large_hourglass_net
 from .networks.pln import get_pln_net
 from .networks.pln_res import get_pln_res_net
+from .networks.mobilenetv2 import get_mobile_net
 
 _model_factory = {
   'res': get_pose_net, # default Resnet with deconv
@@ -23,6 +24,7 @@ _model_factory = {
   'hourglass': get_large_hourglass_net,
   'pln': get_pln_net,
   'plnres': get_pln_res_net,
+  'mobile': get_mobile_net,
 }
 
 def create_model(arch, heads, head_conv):
