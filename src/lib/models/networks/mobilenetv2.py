@@ -2,7 +2,7 @@ from torch import nn
 import torch.utils.model_zoo as model_zoo
 from collections import OrderedDict
 import math
-
+from torchvision.models.utils import load_state_dict_from_url
 
 __all__ = ['MobileNetV2']
 
@@ -136,10 +136,6 @@ def load_model(model,state_dict):
     model.load_state_dict(restore_dict)
 
 
-
-
-
-
 def fill_up_weights(up):
     w = up.weight.data
     f = math.ceil(w.size(2) / 2)
@@ -258,10 +254,21 @@ def mobilenetv2_10(pretrained=True, **kwargs):
         load_model(model,state_dict)
     return model
 
+def load_model(model,state_dict):
+    new_model=model.state_dict()
+    new_keys = list(new_model.keys())
+    old_keys = list(state_dict.keys())
+    restore_dict = OrderedDict()
+    for id in range(len(new_keys)):
+        restore_dict[new_keys[id]] = state_dict[old_keys[id]]
+    model.load_state_dict(restore_dict)
+
 def mobilenetv2_5(pretrained=False, **kwargs):
     model = MobileNetV2(width_mult=0.5)
     if pretrained:
-        print('This version does not have pretrain weights.')
+        print("there's no pretrained model for mobilenetv2_5")
+        #state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'], progress=True)
+        #load_model(model, state_dict)
     return model
 
 # num_layers  : [10 , 5]

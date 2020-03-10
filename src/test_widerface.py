@@ -13,25 +13,25 @@ from opts import opts
 from datasets.dataset_factory import get_dataset
 
 
-def test_img(MODEL_PATH):
-    debug = 1            # draw and show the result image
-    TASK = 'ctdet'  
-    input_h, intput_w = 640, 640
-    # opt = opts().init('--task {} --load_model {} --debug {} --input_h {} --input_w {}'.format(
-    #     TASK, MODEL_PATH, debug, intput_w, input_h).split(' '))
+def test_img(opt):
+    torch.manual_seed(opt.seed)
+    torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
+    Dataset = get_dataset(opt.dataset, opt.task)
+    opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
+    print(opt)
 
     detector = detector_factory[opt.task](opt)
 
     img = '../readme/000388.jpg'
     ret = detector.run(img)['results']
 
-def test_vedio(model_path, vedio_path=None):
-    debug = -1            # return the result image with draw
-    TASK = 'ctdet'
-    vis_thresh = 0.45
-    input_h, intput_w = 640, 640
-    # opt = opts().init('--task {} --load_model {} --debug {} --input_h {} --input_w {} --vis_thresh {}'.format(
-    #     TASK, MODEL_PATH, debug, intput_w, input_h, vis_thresh).split(' '))
+def test_vedio(opt):
+    torch.manual_seed(opt.seed)
+    torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
+    Dataset = get_dataset(opt.dataset, opt.task)
+    opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
+    print(opt)
+
     detector = detector_factory[opt.task](opt)
 
     vedio = vedio_path if vedio_path else 0
@@ -59,14 +59,7 @@ def test_wider_Face(opt):
     wider_face_mat = sio.loadmat('/home/yy/github/ThunderNet/data/wider_face_split/wider_face_val.mat')
     event_list = wider_face_mat['event_list']
     file_list = wider_face_mat['file_list']
-    save_path = '../output/widerface/'
-
-    debug = 0            # return the detect result without show
-    threshold = 0.05
-    TASK = 'ctdet'
-    input_h, intput_w = 800, 800
-    # opt = opts().init('--task {} --load_model {} --debug {} --vis_thresh {} --input_h {} --input_w {}'.format(
-    #     TASK, MODEL_PATH, debug, threshold, input_h, intput_w).split(' '))
+    save_path = opt.outdir
 
     detector = detector_factory[opt.task](opt)
 
@@ -93,6 +86,4 @@ def test_wider_Face(opt):
 
 if __name__ == '__main__':
     opt = opts().parse()
-    # test_img(MODEL_PATH)
     test_wider_Face(opt)
-    # test_wider_Face(MODEL_PATH)

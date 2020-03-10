@@ -62,7 +62,7 @@ class opts(object):
     self.parser.add_argument('--arch', default="dla_34", 
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass | pln | plnres | mobile')
+                                  'dlav0_34 | dla_34 | hourglass | pln | plnres | mobile | shuffle')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -116,6 +116,8 @@ class opts(object):
     self.parser.add_argument('--keep_res', action='store_true',
                              help='keep the original resolution'
                                   ' during validation.')
+    self.parser.add_argument('--outdir', type=str, default='../output/widerface/',
+                             help='output path of test ')
 
     # dataset
     self.parser.add_argument('--not_rand_crop', action='store_true',
@@ -164,7 +166,7 @@ class opts(object):
     self.parser.add_argument('--output_col', default=112, help='')
     self.parser.add_argument('--num_class', default=1, help='')
 
-    self.parser.add_argument('--grid_size', default=14, help='gird size in point linking net')
+    self.parser.add_argument('--grid_size', default=112, help='gird size in point linking net')
     self.parser.add_argument('--ct_nopt_weight', default=1, help='weight')
     self.parser.add_argument('--ct_pt_weight', default=1, help='weight')
     # ctdet
@@ -337,7 +339,8 @@ class opts(object):
         opt.heads.update({'reg': 2})
     elif opt.task == 'pln':
       # assert opt.dataset in ['pascal', 'coco']
-      opt.heads = {'ct': opt.num_classes}
+      #for PLK in 20 cls and 14 res ==> 'lk' : 14 * 2, 'exist' : 1 , 'cls' : 20, 'off' : 2,
+      opt.heads = {'lk': opt.grid_size * 2, 'ct': opt.num_classes, 'off': 2}
     elif opt.task == 'plnres':
       print("yy test")
       opt.heads = {}
