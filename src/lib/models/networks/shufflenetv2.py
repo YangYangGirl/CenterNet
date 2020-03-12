@@ -303,7 +303,7 @@ class ShuffleNetV2(nn.Module):
         x = cem2_output+cem3_output
         x = self.cemse(x)
         ret = {}
-        
+
         for head in self.heads:
             ret[head] = self.__getattr__(head)(x)
         return [ret]

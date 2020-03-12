@@ -239,12 +239,13 @@ class MobileNetSeg(nn.Module):
 
     def forward(self, x):
         x = self.base(x)
-        #print("before dla", x[0].shape) ==> [1, 24, 160, 160]
+        print("before dla", x[0].shape)# ==> [1, 24, 160, 160]
         x = self.dla_up(x)
-        #print("after dla", x.shape) ==> [1, 64, 160, 160]
+        print("after dla", x.shape)# ==> [1, 64, 160, 160]
         ret = {}
         for head in self.heads:
             ret[head] = self.__getattr__(head)(x)
+        print("mobile hm shape"),# ret['hm'].shape)
         return [ret]
 
 
