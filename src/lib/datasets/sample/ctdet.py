@@ -49,8 +49,10 @@ class CTDetDataset(data.Dataset):
     if self.split == 'train':
       if not self.opt.not_rand_crop:
         s = s * np.random.choice(np.arange(0.6, 1.4, 0.1))
-        w_border = self._get_border(128, img.shape[1])
-        h_border = self._get_border(128, img.shape[0])
+        #w_border = self._get_border(128, img.shape[1])
+        #h_border = self._get_border(128, img.shape[0])
+        w_border = self._get_border(32, img.shape[1])
+        h_border = self._get_border(32, img.shape[0])
         c[0] = np.random.randint(low=w_border, high=img.shape[1] - w_border)
         c[1] = np.random.randint(low=h_border, high=img.shape[0] - h_border)
       else:
