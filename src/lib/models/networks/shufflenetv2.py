@@ -188,7 +188,7 @@ class ShuffleNetV2(nn.Module):
         #            )
         self.cem2 = nn.Sequential(
                     #SELayer(232),
-                    conv_1x1_bn(232,256), #prepare to cat
+                    conv_1x1_bn(self.stage_out_channels[3], 256), #prepare to cat
                     nn.BatchNorm2d(256),
                     nn.ReLU(inplace=True)
                     )
@@ -279,6 +279,7 @@ class ShuffleNetV2(nn.Module):
             self.inplanes = planes
 
         return nn.Sequential(*layers)
+
     def forward(self, x):
         #import pdb; pdb.set_trace()
         x = self.conv1(x)
@@ -291,6 +292,10 @@ class ShuffleNetV2(nn.Module):
             cem1_input = x
           if k == 11:
             cem2_input = x
+          # if k == 1:
+          #   cem1_input = x
+          # if k == 4:
+          #   cem2_input = x
         #   if k == 15:
         #     cem3_input = x
         x = self.conv_last(x)
@@ -331,8 +336,9 @@ class ShuffleNetV2(nn.Module):
             
 
 
-def shufflenetv2(width_mult=1.):
-    model = ShuffleNetV2(width_mult=width_mult)
+def shufflenetv2(heads, head_conv, width_mult=0.5):
+    print("width_mult of shufflenetv2 ==> ", width_mult)
+    model = ShuffleNetV2(heads, head_conv, width_mult=0.5)
     return model
 
 # if __name__ == "__main__":
@@ -345,7 +351,7 @@ def shufflenetv2(width_mult=1.):
 #     print(model)
 
 def get_shufflev2_net(num_layers, heads, head_conv):
-  model = ShuffleNetV2(heads, head_conv)
-  model.init_weights( pretrained=True)
+  model = shufflenetv2(heads, head_conv)
+  model.init_weights(pretrained=True)
   
   return model

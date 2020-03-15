@@ -14,8 +14,14 @@ from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.image import draw_dense_reg
 import math
 
+min_shape = [100000, 100000]
+max_shape = [0, 0]
+
 class CTDetDataset(data.Dataset):
+
+
   def _coco_box_to_bbox(self, box):
+
     bbox = np.array([box[0], box[1], box[0] + box[2], box[1] + box[3]],
                     dtype=np.float32)
     return bbox
@@ -28,6 +34,7 @@ class CTDetDataset(data.Dataset):
 
   def __getitem__(self, index):
     img_id = self.images[index]
+
     file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
     img_path = os.path.join(self.img_dir, file_name)
     ann_ids = self.coco.getAnnIds(imgIds=[img_id])
@@ -36,6 +43,8 @@ class CTDetDataset(data.Dataset):
 
     img = cv2.imread(img_path)
     height, width = img.shape[0], img.shape[1]
+
+
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
     if self.opt.keep_res:
       input_h = (height | self.opt.pad) + 1
@@ -101,6 +110,19 @@ class CTDetDataset(data.Dataset):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
       cls_id = int(self.cat_ids[ann['category_id']])
+
+      b = bbox
+      global min_shape
+      global max_shape
+
+      # if min_shape[0] * min_shape[1] > (b[2] - b[0])/width*96 * (b[3] - b[1])/height*128:
+      #   min_shape = [(b[2] - b[0])/width*96, (b[3] - b[1])/height*128]
+      #   print("min_shape =====================>", min_shape)
+
+      # if max_shape[0] * max_shape[1] < (b[2] - b[0])/width*96 * (b[3] - b[1])/height*128:
+      #   max_shape = [(b[2] - b[0])/width*96, (b[3] - b[1])/height*128]
+      #   print("max_shape =====================>", max_shape)
+
       if flipped:
         bbox[[0, 2]] = width - bbox[[2, 0]] - 1
       bbox[:2] = affine_transform(bbox[:2], trans_output)
@@ -108,6 +130,7 @@ class CTDetDataset(data.Dataset):
       bbox[[0, 2]] = np.clip(bbox[[0, 2]], 0, output_w - 1)
       bbox[[1, 3]] = np.clip(bbox[[1, 3]], 0, output_h - 1)
       h, w = bbox[3] - bbox[1], bbox[2] - bbox[0]
+
       if h > 0 and w > 0:
         radius = gaussian_radius((math.ceil(h), math.ceil(w)))
         radius = max(0, int(radius))
@@ -127,7 +150,6 @@ class CTDetDataset(data.Dataset):
         gt_det.append([ct[0] - w / 2, ct[1] - h / 2, 
                        ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
     
-    #print("hm shape", hm.shape)# (20, 96, 96)
     ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh}
     if self.opt.dense_wh:
       hm_a = hm.max(axis=0, keepdims=True)

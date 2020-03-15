@@ -11,9 +11,11 @@ import os
 
 import torch.utils.data as data
 
+max = [0, 0]
+
 class FaceVOC(data.Dataset):
   num_classes = 1
-  default_resolution = [320, 320]
+  default_resolution = [512, 512]
   mean = np.array([0.485, 0.456, 0.406],
                    dtype=np.float32).reshape(1, 1, 3)
   std  = np.array([0.229, 0.224, 0.225],

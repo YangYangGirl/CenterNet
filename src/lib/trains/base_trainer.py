@@ -17,13 +17,13 @@ class ModleWithLoss(torch.nn.Module):
   
   def forward(self, batch):
 
-    # m = torch.randn(1, 3, 512, 512).cuda()
-    # flops, params = profile(self.model, inputs=(m,))
-    #
+    m = torch.randn(1, 3, 512, 512).cuda()
+    flops, params = profile(self.model, inputs=(m,))
+
     # print(m.shape)
     # print("flops:", flops/10e5)
     # print("parameters", params/10e5)
-    #
+
     # m = torch.randn(1, 3, 320, 320).cuda()
     # flops, params = profile(self.model, inputs=(m,))
     #
