@@ -330,9 +330,9 @@ class ShuffleNetV2(nn.Module):
                     nn.init.constant_(m.weight, 1)
                     nn.init.constant_(m.bias, 0)
             #pretrained_state_dict = torch.load(pretrained)
-            #address = "/root/lbc/shufflenet-centernet/shufflenetv2_x1_69.402_88.374.pth.tar"
-            #pretrained_state_dict = torch.load(address)
-            #self.load_state_dict(pretrained_state_dict, strict=False)
+            address = "/home/yy/github/CenterNet/exp/pretrained/shufflenetv2_x0.5_60.646_81.696.pth.tar"
+            pretrained_state_dict = torch.load(address)
+            self.load_state_dict(pretrained_state_dict, strict=False)
             
 
 

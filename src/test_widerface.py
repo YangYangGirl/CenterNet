@@ -71,7 +71,7 @@ def test_wider_Face(opt):
         for num, file in enumerate(file_list_item):
             im_name = file[0][0]
             zip_name = '%s/%s.jpg' % (im_dir, im_name)
-            print(os.path.join(Path, zip_name))
+            #print(os.path.join(Path, zip_name))
             img_path = os.path.join(Path, zip_name)
             dets = detector.run(img_path)['results']
             f = open(save_path + im_dir + '/' + im_name + '.txt', 'w')
@@ -81,7 +81,7 @@ def test_wider_Face(opt):
                 x1, y1, x2, y2, s = b[0], b[1], b[2], b[3], b[4]
                 f.write('{:.1f} {:.1f} {:.1f} {:.1f} {:.3f}\n'.format(x1, y1, (x2 - x1 + 1), (y2 - y1 + 1), s))
             f.close()
-            print('event:%d num:%d' % (index + 1, num + 1))
+            #print('event:%d num:%d' % (index + 1, num + 1))
 
 
 if __name__ == '__main__':
