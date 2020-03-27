@@ -16,6 +16,8 @@ from .networks.pln import get_pln_net
 from .networks.pln_res import get_pln_res_net
 from .networks.mobilenetv2 import get_mobile_net
 from .networks.shufflenetv2 import get_shufflev2_net
+from .networks.shufflenetv2_dw_5_5 import get_shufflev2_net as get_shufflev2_dw_5_5_net
+from .networks.shufflenetv2_cem import get_shufflev2_net as get_shufflev2_cem
 
 _model_factory = {
   'res': get_pose_net, # default Resnet with deconv
@@ -27,6 +29,9 @@ _model_factory = {
   'plnres': get_pln_res_net,
   'mobile': get_mobile_net,
   'shuffle': get_shufflev2_net,
+  'shuffleDw5': get_shufflev2_dw_5_5_net,
+  'shuffleCem': get_shufflev2_cem,
+
 }
 
 def create_model(arch, heads, head_conv):

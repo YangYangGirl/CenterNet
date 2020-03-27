@@ -82,7 +82,7 @@ class InvertedResidual(nn.Module):
                 nn.BatchNorm2d(oup_inc),
                 nn.ReLU(inplace=True),
                 # dw
-                nn.Conv2d(oup_inc, oup_inc, 3, stride, 1, groups=oup_inc, bias=False),
+                nn.Conv2d(oup_inc, oup_inc, 5, stride, 2, groups=oup_inc, bias=False),
                 nn.BatchNorm2d(oup_inc),
                 # pw-linear
                 nn.Conv2d(oup_inc, oup_inc, 1, 1, 0, bias=False),
@@ -92,7 +92,7 @@ class InvertedResidual(nn.Module):
         else:                  
             self.banch1 = nn.Sequential(
                 # dw
-                nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False),
+                nn.Conv2d(inp, inp, 5, stride, 2, groups=inp, bias=False),
                 nn.BatchNorm2d(inp),
                 # pw-linear
                 nn.Conv2d(inp, oup_inc, 1, 1, 0, bias=False),
@@ -106,7 +106,7 @@ class InvertedResidual(nn.Module):
                 nn.BatchNorm2d(oup_inc),
                 nn.ReLU(inplace=True),
                 # dw
-                nn.Conv2d(oup_inc, oup_inc, 3, stride, 1, groups=oup_inc, bias=False),
+                nn.Conv2d(oup_inc, oup_inc, 5, stride, 2, groups=oup_inc, bias=False),
                 nn.BatchNorm2d(oup_inc),
                 # pw-linear
                 nn.Conv2d(oup_inc, oup_inc, 1, 1, 0, bias=False),
@@ -141,6 +141,7 @@ class ShuffleNetV2(nn.Module):
         # index 0 is invalid and should never be called.
         # only used for indexing convenience.
         if width_mult == 0.5:
+            #self.stage_out_channels = [-1, 12, 24, 48, 96, 1024]
             self.stage_out_channels = [-1, 24,  48,  96, 192, 1024]
         elif width_mult == 1.0:
             self.stage_out_channels = [-1, 24, 116, 232, 464, 1024]
@@ -332,7 +333,20 @@ class ShuffleNetV2(nn.Module):
             #pretrained_state_dict = torch.load(pretrained)
             address = "/home/yy/github/CenterNet/exp/pretrained/shufflenetv2_x0.5_60.646_81.696.pth.tar"
             pretrained_state_dict = torch.load(address)
-           
+
+            for k, v in pretrained_state_dict.items():
+                if (k.split('.')[2] == 'banch1' and k.split('.')[3] == '0') \
+                        or (k.split('.')[2] == 'banch2' and k.split('.')[3] == '3'):
+                    dim_0, dim_1 = v.shape[0], v.shape[1]
+                    padding_v = torch.zeros([dim_0, dim_1, 5, 5])
+                    for g in range(dim_0):
+                        for f in range(dim_1):
+                            for i in range(1, 4):
+                                for j in range(1, 4):
+                                    padding_v[g][f][i][j] = v[g][f][i-1][j-1]
+                    pretrained_state_dict[k] = padding_v
+
+
 
             self.load_state_dict(pretrained_state_dict, strict=False)
             
