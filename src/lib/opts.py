@@ -68,7 +68,7 @@ class opts(object):
                                   '0 for no conv layer'
                                   '-1 for default setting: '
                                   '64 for resnets and 256 for dla.')
-    self.parser.add_argument('--down_ratio', type=int, default=16,
+    self.parser.add_argument('--down_ratio', type=int, default=32,
                              help='output stride. Currently only supports 4.')
 
     # input
@@ -106,7 +106,7 @@ class opts(object):
                              help='multi scale test augmentation.')
     self.parser.add_argument('--nms', action='store_true',
                              help='run nms in testing.')
-    self.parser.add_argument('--K', type=int, default=50,
+    self.parser.add_argument('--K', type=int, default=10,
                              help='max number of output objects.') 
     self.parser.add_argument('--not_prefetch_test', action='store_true',
                              help='not use parallal data pre-processing.')

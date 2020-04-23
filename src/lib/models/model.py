@@ -16,8 +16,14 @@ from .networks.pln import get_pln_net
 from .networks.pln_res import get_pln_res_net
 from .networks.mobilenetv2 import get_mobile_net
 from .networks.shufflenetv2 import get_shufflev2_net
+from .networks.shufflenetv2_99 import get_shufflev2_net as get_shufflev2_99_net
+from .networks.shufflenetv2p_down16_6 import get_shufflev2_net as get_shufflev2p_down16_6_net
+from .networks.shufflenetv2p_down16_4 import get_shufflev2_net as get_shufflev2p_down16_4_net
+from .networks.shufflenetv2p_down16_10 import get_shufflev2_net as get_shufflev2p_down16_10_net
 from .networks.shufflenetv2_dw_5_5 import get_shufflev2_net as get_shufflev2_dw_5_5_net
 from .networks.shufflenetv2_cem import get_shufflev2_net as get_shufflev2_cem
+from .networks.Mb_Tiny import get_Mb_Tiny_net as get_mb_tiny
+from .networks.Mb_Tiny_RFB import get_Mb_Tiny_RFB_net as get_mb_tiny_rfb
 
 _model_factory = {
   'res': get_pose_net, # default Resnet with deconv
@@ -31,6 +37,12 @@ _model_factory = {
   'shuffle': get_shufflev2_net,
   'shuffleDw5': get_shufflev2_dw_5_5_net,
   'shuffleCem': get_shufflev2_cem,
+  'shuffle9': get_shufflev2_99_net,
+  'shuffle16y6': get_shufflev2p_down16_6_net,
+  'shuffle16y4': get_shufflev2p_down16_4_net,
+  'shuffle16y10': get_shufflev2p_down16_10_net,
+  'MbTiny': get_mb_tiny,
+  'MbTinyRFB': get_mb_tiny_rfb,
 
 }
 
