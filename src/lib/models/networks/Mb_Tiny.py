@@ -51,11 +51,11 @@ class Mb_Tiny(nn.Module):
             conv_dw(self.base_channel * 4, self.base_channel * 8, 2),  # 20*15
             conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
             conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
-            conv_dw(self.base_channel * 8, self.base_channel * 16, 2),  # 10*8
-            conv_dw(self.base_channel * 16, self.base_channel * 16, 1)
+            #conv_dw(self.base_channel * 8, self.base_channel * 16, 2),  # 10*8
+            #conv_dw(self.base_channel * 16, self.base_channel * 16, 1)
         )
 
-        self.inplanes = 256
+        self.inplanes = 128
 
         self.heads = heads
         for head in self.heads:

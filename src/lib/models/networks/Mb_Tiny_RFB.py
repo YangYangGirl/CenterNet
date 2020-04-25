@@ -1,8 +1,17 @@
+import torch
 from torch import nn
 import torch.utils.model_zoo as model_zoo
 from collections import OrderedDict
 import math
 from torchvision.models.utils import load_state_dict_from_url
+def fill_fc_weights(layers):
+    for m in layers.modules():
+        if isinstance(m, nn.Conv2d):
+            nn.init.normal_(m.weight, std=0.001)
+            # torch.nn.init.kaiming_normal_(m.weight.data, nonlinearity='relu')
+            # torch.nn.init.xavier_normal_(m.weight.data)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
 
 class BasicConv(nn.Module):
 
@@ -113,13 +122,13 @@ class Mb_Tiny_RFB(nn.Module):
             conv_dw(self.base_channel * 4, self.base_channel * 8, 2),  # 20*15
             conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
             conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
-            conv_dw(self.base_channel * 8, self.base_channel * 16, 2),  # 10*8
-            conv_dw(self.base_channel * 16, self.base_channel * 16, 1)
+            #conv_dw(self.base_channel * 8, self.base_channel * 16, 2),  # 10*8
+            #conv_dw(self.base_channel * 16, self.base_channel * 16, 1)
         )
 
         # add heads
 
-        self.inplanes = 256
+        self.inplanes = 128
 
         self.heads = heads
         for head in self.heads:
@@ -147,6 +156,23 @@ class Mb_Tiny_RFB(nn.Module):
             self.__setattr__(head, fc)
 
         self.fc = nn.Linear(1024, num_classes)
+    
+
+    def init_weights(self, pretrained=True):
+        if pretrained:
+            # print('=> init resnet deconv weights from normal distribution')
+            for _, m in self.cem3.named_modules():
+                if isinstance(m, nn.ConvTranspose2d):
+                    nn.init.normal_(m.weight, std=0.001)
+                    if self.deconv_with_bias:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.BatchNorm2d):
+                    nn.init.constant_(m.weight, 1)
+                    nn.init.constant_(m.bias, 0)
+            # pretrained_state_dict = torch.load(pretrained)
+            address = "/home/yy/github/CenterNet/exp/pretrained/shufflenetv2_x0.5_60.646_81.696.pth.tar"
+            pretrained_state_dict = torch.load(address)
+            self.load_state_dict(pretrained_state_dict, strict=False)
 
     def forward(self, x):
         x = self.model(x)
@@ -162,6 +188,6 @@ class Mb_Tiny_RFB(nn.Module):
 
 def get_Mb_Tiny_RFB_net(num_layers, heads, head_conv):
     model = Mb_Tiny_RFB(heads, head_conv, width_mult=0.5)
-    model.init_weights(pretrained=True)
+    model.init_weights(pretrained=False)
 
     return model
