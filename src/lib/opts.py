@@ -356,6 +356,27 @@ class opts(object):
         opt.heads.update({'hm_hp': 17})
       if opt.reg_hp_offset:
         opt.heads.update({'hp_offset': 2})
+    elif opt.task == 'landmark':
+      # assert opt.dataset in ['coco_hp']
+      opt.flip_idx = dataset.flip_idx
+      opt.heads = {'hm': opt.num_classes,
+                   'wh': 2 if not opt.cat_spec_wh else 2 * opt.num_classes, 'hps': 20}
+      if opt.reg_offset:
+          opt.heads.update({'reg': 2})
+      if opt.hm_hp:
+          opt.heads.update({'hm_hp': 10})
+      if opt.reg_hp_offset:
+          opt.heads.update({'hp_offset': 2})
+
+
+      opt.flip_idx = dataset.flip_idx
+      opt.heads = {'hm': opt.num_classes, 'wh': 2, 'hps': 34}
+      if opt.reg_offset:
+        opt.heads.update({'reg': 2})
+      if opt.hm_hp:
+        opt.heads.update({'hm_hp': 17})
+      if opt.reg_hp_offset:
+        opt.heads.update({'hp_offset': 2})
     else:
       assert 0, 'task not defined!'
     print('heads', opt.heads)
