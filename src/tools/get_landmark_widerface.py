@@ -54,6 +54,10 @@ def get_landmark(txt_path, save_path):
     annotationfile.close()
 
 if __name__ == '__main__':
-    txt_path = 'label.txt'
-    save_path = 'val.txt'
+    txt_path = '../../data/retinaface_gt_v1.1/val/label.txt'
+    save_path = '../../data/retinaface_gt_v1.1/val/val.txt'
     get_landmark(txt_path, save_path)
+    txt_path = '../../data/retinaface_gt_v1.1/train/label.txt'
+    save_path = '../../data/retinaface_gt_v1.1/train/train.txt'
+    get_landmark(txt_path, save_path)
+    

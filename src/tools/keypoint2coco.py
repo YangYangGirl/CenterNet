@@ -101,6 +101,7 @@ class Keypoints2COCO(COCO):
                 img = cv2.imread(os.path.join(self.images_path, img_path))
                 if img is None:
                     continue
+                print("deal :", self.images_path, img_path)
                 image["height"] = img.shape[0]
                 image["width"] = img.shape[1]
 
@@ -137,8 +138,14 @@ class Keypoints2COCO(COCO):
         json.dump(jsdata,open(self.save_json_path,'w'), indent=4, default=float) # python3 需加上default=float 否则会报错
 
 
-img_path = 'val'
-txt_path = 'val.txt'
-save_path = 'keypoints_val.json'
+img_path = '../../data/widerface/val/images'
+txt_path = '../../data/retinaface_gt_v1.1/val/val.txt'
+save_path = '../../data/retinaface_gt_v1.1/Annotations/keypoints_val.json'
+
+Keypoints2COCO(txt_path, save_path, img_path)()
+
+img_path = '../../data/widerface/train/images'
+txt_path = '../../data/retinaface_gt_v1.1/train/train.txt'
+save_path = '../../data/retinaface_gt_v1.1/Annotations/keypoints_train.json'
 
 Keypoints2COCO(txt_path, save_path, img_path)()

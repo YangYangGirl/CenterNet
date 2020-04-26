@@ -8,6 +8,7 @@ from .exdet import ExdetTrainer
 from .multi_pose import MultiPoseTrainer
 from .pln import plnCtdetTrainer
 from .plnres import plnresCtdetTrainer
+from .landmark import LandmarkTrainer
 
 train_factory = {
   'exdet': ExdetTrainer, 
@@ -16,4 +17,5 @@ train_factory = {
   'multi_pose': MultiPoseTrainer,
   'pln': plnCtdetTrainer, 
   'plnres': plnresCtdetTrainer,
+  'landmark': LandmarkTrainer,
 }

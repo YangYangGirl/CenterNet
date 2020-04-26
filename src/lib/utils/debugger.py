@@ -69,6 +69,8 @@ class Debugger(object):
       self.H = 375
     elif num_classes == 1 or dataset == 'face':
         self.names = face_class_name
+    elif num_classes == 1 or dataset == 'landmark':
+        self.names = face_class_name
     num_classes = len(self.names)
     self.down_ratio=down_ratio
     # for bird view

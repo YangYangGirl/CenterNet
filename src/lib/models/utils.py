@@ -41,7 +41,7 @@ def flip_lr(x, flip_idx):
 def flip_lr_off(x, flip_idx):
   tmp = x.detach().cpu().numpy()[..., ::-1].copy()
   shape = tmp.shape
-  tmp = tmp.reshape(tmp.shape[0], 17, 2, 
+  tmp = tmp.reshape(tmp.shape[0], 5, 2, 
                     tmp.shape[2], tmp.shape[3])
   tmp[:, :, 0, :, :] *= -1
   for e in flip_idx:

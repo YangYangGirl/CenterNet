@@ -8,19 +8,21 @@ from .sample.ctdet import CTDetDataset
 from .sample.multi_pose import MultiPoseDataset
 from .sample.pln import plnCTDetDataset
 from .sample.plnres import plnresCTDetDataset
+from .sample.landmark import LandmarkDataset
 
 from .dataset.coco import COCO
 from .dataset.pascal import PascalVOC
 from .dataset.kitti import KITTI
 from .dataset.coco_hp import COCOHP
 from .dataset.face_pas import FaceVOC
-
+from .dataset.coco_lm_hp import COCOHP_LM
 dataset_factory = {
   'coco': COCO,
   'pascal': PascalVOC,
   'kitti': KITTI,
   'coco_hp': COCOHP,
   'face': FaceVOC,
+  'landmark': COCOHP_LM,
 }
 
 _sample_factory = {
@@ -28,6 +30,7 @@ _sample_factory = {
   'ctdet': CTDetDataset,
   'ddd': DddDataset,
   'multi_pose': MultiPoseDataset,
+  'landmark': LandmarkDataset,
   'pln': plnCTDetDataset,
   'plnres': plnresCTDetDataset, 
 }
