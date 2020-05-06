@@ -12,7 +12,7 @@ from external.nms import soft_nms_39
 from models.decode import multi_pose_decode
 from models.utils import flip_tensor, flip_lr_off, flip_lr
 from utils.image import get_affine_transform
-from utils.post_process import multi_pose_post_process
+from utils.post_process import landmark_post_process
 from utils.debugger import Debugger
 
 from .base_detector import BaseDetector
@@ -57,7 +57,7 @@ class LandmarkDetector(BaseDetector):
 
   def post_process(self, dets, meta, scale=1):
     dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
-    dets = multi_pose_post_process(
+    dets = landmark_post_process(
       dets.copy(), [meta['c']], [meta['s']],
       meta['out_height'], meta['out_width'])
     for j in range(1, self.num_classes + 1):
