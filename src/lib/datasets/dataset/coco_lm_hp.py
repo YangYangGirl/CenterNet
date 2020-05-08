@@ -23,13 +23,16 @@ class COCOHP_LM(data.Dataset):
 
     def __init__(self, opt, split):
         super(COCOHP_LM, self).__init__()
-        self.edges = [[0, 1], [0, 2], [1, 3], [2, 4],
+        '''self.edges = [[0, 1], [0, 2], [1, 3], [2, 4],
                       [4, 6], [3, 5], [5, 6],
                       [5, 7], [7, 9], [6, 8], [8, 10],
                       [6, 12], [5, 11], [11, 12],
                       [12, 14], [14, 16], [11, 13], [13, 15]]
+        '''
+        self.edges = [[0, 1], [0, 2], [1, 3], [2, 4]]
 
-        self.acc_idxs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        #self.acc_idxs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        self.acc_idxs = [1, 2, 3, 4]      
         self.data_dir = os.path.join(opt.data_dir, 'retinaface_gt_v1.1')
         self.img_dir = os.path.join(self.data_dir, 'widerface', split, 'images')
         if split == 'test':
@@ -53,6 +56,7 @@ class COCOHP_LM(data.Dataset):
         self.opt = opt
 
         print('==> initializing coco 2017 {} data.'.format(split))
+        print("self.coco load from", self.annot_path)
         self.coco = coco.COCO(self.annot_path)
         image_ids = self.coco.getImgIds()
 
@@ -109,6 +113,7 @@ class COCOHP_LM(data.Dataset):
         # detections  = convert_eval_format(all_boxes)
         # json.dump(detections, open(result_json, "w"))
         self.save_results(results, save_dir)
+        print("save results:", '{}/results.json'.format(save_dir))
         coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
         coco_eval = COCOeval(self.coco, coco_dets, "keypoints")
         coco_eval.evaluate()

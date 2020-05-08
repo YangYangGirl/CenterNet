@@ -44,6 +44,15 @@ class Debugger(object):
         (255, 0, 0), (0, 0, 255), (255, 0, 0), (0, 0, 255),
         (255, 0, 0), (0, 0, 255), (255, 0, 0), (0, 0, 255),
         (255, 0, 0), (0, 0, 255)]
+    elif dataset == 'landmark':
+      self.names = ['p']
+      self.num_class = 1
+      self.num_joints = 5
+      self.edges = [[0, 1], [0, 2], [1, 3], [2, 4]]
+      self.ec = [(255, 0, 0), (0, 0, 255), (255, 0, 0), (0, 0, 255), 
+                 (255, 0, 0)]
+      self.colors_hp = [(255, 0, 255), (255, 0, 0), (0, 0, 255), 
+        (255, 0, 0), (0, 0, 255)]
     elif num_classes == 80 or dataset == 'coco':
       self.names = coco_class_name
     elif num_classes == 20 or dataset == 'pascal':

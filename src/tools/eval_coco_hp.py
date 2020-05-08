@@ -11,7 +11,7 @@ import pickle
 import os
 
 this_dir = os.path.dirname(__file__)
-ANN_PATH = this_dir + '../../data/coco/annotations/person_keypoints_val2017.json'
+ANN_PATH = this_dir + '../../data/retinaface_gt_v1.1/Annotations/keypoints_val.json'
 print(ANN_PATH)
 if __name__ == '__main__':
   pred_path = sys.argv[1]
