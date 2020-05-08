@@ -3,7 +3,7 @@
 - The directory structure of CenterNet_ROOT/data:
 (use CenterNet_ROOT/src/tools/keypoint2coco.py to get Retinaface dataset in coco format)
 
-'''
+~~~
 |-- face
 |   |-- Annotations
 |   |-- ImageSets
@@ -20,14 +20,13 @@
 |   |-- val
 |   `-- widerface -> /data/FaceDetection/widerface
 `-- widerface -> /data/FaceDetection/widerface
-'''
+~~~
 
 
-
+- For usage:
 ~~~
 cd experiments
 bash landmark_dla_1x.sh
-
 ~~~
 Continuous update, welcome to discuss with me(QQ: 1525927685)
 
