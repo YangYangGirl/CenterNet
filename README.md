@@ -1,8 +1,9 @@
-#Adding Retinaface dataset
+# Adding Retinaface dataset
 
-The directory structure of CenterNet_ROOT/data:
+- The directory structure of CenterNet_ROOT/data:
 (use CenterNet_ROOT/src/tools/keypoint2coco.py to get Retinaface dataset in coco format)
 
+'''
 |-- face
 |   |-- Annotations
 |   |-- ImageSets
@@ -19,7 +20,7 @@ The directory structure of CenterNet_ROOT/data:
 |   |-- val
 |   `-- widerface -> /data/FaceDetection/widerface
 `-- widerface -> /data/FaceDetection/widerface
-
+'''
 
 
 
