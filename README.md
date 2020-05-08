@@ -1,3 +1,40 @@
+#Adding Retinaface dataset
+
+The directory structure of CenterNet_ROOT/data:
+(use CenterNet_ROOT/src/tools/keypoint2coco.py to get Retinaface dataset in coco format)
+
+|-- face
+|   |-- Annotations
+|   |-- ImageSets
+|   |-- VOCdevkit
+|   |-- WIDER_val
+|   |-- annotations
+|   |-- images
+|   |-- train2014
+|   `-- val2014
+|-- retinaface_gt_v1.1
+|   |-- Annotations
+|   |-- test
+|   |-- train
+|   |-- val
+|   `-- widerface -> /data/FaceDetection/widerface
+`-- widerface -> /data/FaceDetection/widerface
+
+
+
+
+~~~
+cd experiments
+bash landmark_dla_1x.sh
+
+~~~
+Continuous update, welcome to discuss with me(QQ: 1525927685)
+
+
+
+
+
+
 # Objects as Points
 Object detection, 3D detection, and pose estimation using center point detection:
 ![](readme/fig2.png)
