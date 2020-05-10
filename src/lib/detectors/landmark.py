@@ -92,9 +92,9 @@ class LandmarkDetector(BaseDetector):
       debugger.add_blend_img(img, pred, 'pred_hmhp')
   
   def show_results(self, debugger, image, results):
-    debugger.add_img(image, img_id='multi_pose')
+    debugger.add_img(image, img_id='landmark')
     for bbox in results[1]:
       if bbox[4] > self.opt.vis_thresh:
-        debugger.add_coco_bbox(bbox[:4], 0, bbox[4], img_id='multi_pose')
-        debugger.add_coco_hp(bbox[5:15], img_id='multi_pose')
+        debugger.add_coco_bbox(bbox[:4], 0, bbox[4], img_id='landmark')
+        debugger.add_coco_hp(bbox[5:15], img_id='landmark')
     debugger.show_all_imgs(pause=self.pause)

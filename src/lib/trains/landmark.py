@@ -107,10 +107,10 @@ class LandmarkTrainer(BaseTrainer):
     dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
 
     dets[:, :, :4] *= opt.input_res / opt.output_res
-    dets[:, :, 5:39] *= opt.input_res / opt.output_res
+    dets[:, :, 5:15] *= opt.input_res / opt.output_res
     dets_gt = batch['meta']['gt_det'].numpy().reshape(1, -1, dets.shape[2])
     dets_gt[:, :, :4] *= opt.input_res / opt.output_res
-    dets_gt[:, :, 5:39] *= opt.input_res / opt.output_res
+    dets_gt[:, :, 5:15] *= opt.input_res / opt.output_res
     for i in range(1):
       debugger = Debugger(
         dataset=opt.dataset, ipynb=(opt.debug==3), theme=opt.debugger_theme)
@@ -127,14 +127,14 @@ class LandmarkTrainer(BaseTrainer):
         if dets[i, k, 4] > opt.center_thresh:
           debugger.add_coco_bbox(dets[i, k, :4], dets[i, k, -1],
                                  dets[i, k, 4], img_id='out_pred')
-          debugger.add_coco_hp(dets[i, k, 5:39], img_id='out_pred')
+          debugger.add_coco_hp(dets[i, k, 5:15], img_id='out_pred')
 
       debugger.add_img(img, img_id='out_gt')
       for k in range(len(dets_gt[i])):
         if dets_gt[i, k, 4] > opt.center_thresh:
           debugger.add_coco_bbox(dets_gt[i, k, :4], dets_gt[i, k, -1],
                                  dets_gt[i, k, 4], img_id='out_gt')
-          debugger.add_coco_hp(dets_gt[i, k, 5:39], img_id='out_gt')
+          debugger.add_coco_hp(dets_gt[i, k, 5:15], img_id='out_gt')
 
       if opt.hm_hp:
         pred = debugger.gen_colormap_hp(output['hm_hp'][i].detach().cpu().numpy())

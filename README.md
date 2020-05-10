@@ -25,7 +25,7 @@
 
 - For usage:
 ~~~
-cd experiments
+cd CenterNet_ROOT/experiments
 bash landmark_dla_1x.sh
 ~~~
 Continuous update, welcome to discuss with me(QQ: 1525927685)

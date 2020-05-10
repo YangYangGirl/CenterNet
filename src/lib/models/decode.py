@@ -628,6 +628,7 @@ def multi_pose_decode(
     heat, wh, kps, reg=None, hm_hp=None, hp_offset=None, K=100):
   batch, cat, height, width = heat.size()
   num_joints = kps.shape[1] // 2
+  print("decode to ", num_joints, " joints")
   # heat = torch.sigmoid(heat)
   # perform nms on heatmaps
   heat = _nms(heat)
